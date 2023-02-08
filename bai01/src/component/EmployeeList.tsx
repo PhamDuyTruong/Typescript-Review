@@ -20,7 +20,7 @@ const EmployeeList = (props: IProps) => {
                 <th>Action</th>
             </tr>
             {list.map((item) => (
-                <tr key={item.id}>
+                <tr>
                     <td>{`${item.firstName} ${item.lastName}`}</td>
                     <td>{item.email}</td>
                     <td>

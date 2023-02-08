@@ -41,6 +41,7 @@ const showListPage = () => {
           <header>
             <h1>Simple CRUD Application</h1>
           </header>
+        </article>
           <section className='section-content'>
             { showPage === PageNum.list && (
               <>
@@ -60,7 +61,7 @@ const showListPage = () => {
             }
 
           </section>
-        </article>
+
     </>
   )
 }
