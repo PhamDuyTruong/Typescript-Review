@@ -1,10 +1,18 @@
 import React, {useState} from 'react'
 import { IEmployee } from './Employee.type';
+import "./EmployeeForm.style.css";
 
-const AddEmployee = () => {
+type IProps = {
+    onBackClick: () => void;
+    onSubmitClick: (data: IEmployee) => void
+}
+
+const AddEmployee = (props: IProps) => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+
+    const {onBackClick, onSubmitClick} = props;
 
     const onChangeFirstName = (e: any) => {
         setFirstName(e.target.value);
@@ -26,6 +34,8 @@ const AddEmployee = () => {
             lastName: lastName,
             email: email
         }
+        onSubmitClick(data);
+        onBackClick();
     }
   return (
     <div className='form-container'>
@@ -58,7 +68,7 @@ const AddEmployee = () => {
                 />
             </div>
             <div>
-                {/* Back button */}
+                <input type="button" value="Back" onClick={onBackClick} />
                 <input type="submit" value="Add Employee"/>
             </div>
         </form>

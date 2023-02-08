@@ -6,4 +6,7 @@ export interface IEmployee{
 }
 
 export enum PageNum{
+    list,
+    add, 
+    edit
 }
