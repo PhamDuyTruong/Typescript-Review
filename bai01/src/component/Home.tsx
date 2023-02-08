@@ -3,12 +3,13 @@ import { IEmployee, PageNum } from './Employee.type';
 import EmployeeList from './EmployeeList';
 import AddEmployee from './AddEmployee';
 import "./Home.style.css";
+import EditEmployee from './EditEmployee';
 
 
 const Home = () => {
   const [employeeList, setEmployeeList] = useState([] as IEmployee[]);
   const [showPage, setShowPage] = useState(PageNum.list);
-  
+  const [dataToEdit, setDataToEdit] = useState({} as IEmployee);
 
   useEffect(() => {
     const listInString = window.localStorage.getItem("EmployeeList");
@@ -39,6 +40,19 @@ const deleteEmployee = (data: IEmployee) => {
    const tempList = [...employeeList];
    tempList.splice(deletedIndex, 1);
    handleEmployeeList(tempList);
+};
+
+const updateData = (data: IEmployee) => {
+  const filteredData = employeeList.filter((x) => x.id === data.id)[0];
+  const indexOfRecord = employeeList.indexOf(filteredData);
+  const tempData = [...employeeList];
+  tempData[indexOfRecord] = data;
+  handleEmployeeList(tempData);
+};
+
+const editEmployeeData = (data: IEmployee) => {
+  setShowPage(PageNum.edit);
+  setDataToEdit(data);
 }
 
  
@@ -53,7 +67,7 @@ const deleteEmployee = (data: IEmployee) => {
             { showPage === PageNum.list && (
               <>
                  <input type="button" value="ADD" onClick={onAddEmployeeClick}  className="add-employee-btn"/>
-                <EmployeeList list={employeeList} onDeleteClick={deleteEmployee}/>
+                <EmployeeList list={employeeList} onDeleteClick={deleteEmployee} onEdit={editEmployeeData}/>
               </>
               )
             }
@@ -66,6 +80,14 @@ const deleteEmployee = (data: IEmployee) => {
               </>
             )
             }
+
+          {showPage === PageNum.edit && (
+          <EditEmployee
+            data={dataToEdit}
+            onBackClick={showListPage}
+            onUpdateClick={updateData}
+          />
+        )}
 
           </section>
 
