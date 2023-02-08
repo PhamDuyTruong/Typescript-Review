@@ -1,9 +1,34 @@
 import React from 'react';
-import "./EmployeeModal.style.css"
+import { IEmployee } from './Employee.type';
+import "./EmployeeModal.style.css";
 
-const EmployeeModal = () => {
+type IProps = {
+    data: IEmployee;
+    onClose: () => void
+}
+
+const EmployeeModal = (props: IProps) => {
+    const {data, onClose} = props;
   return (
-    <div>EmployeeModal</div>
+    <div id="myModal" className="modal">
+        <div className="modal-content">
+        <span className="close" onClick={onClose}>
+          &times;
+        </span>
+        <h3>Employee Data</h3>
+        <div>
+          <div>
+            <label>First Name: {data.firstName}</label>
+          </div>
+          <div>
+            <label>Last Name: {data.lastName}</label>
+          </div>
+          <div>
+            <label>Email: {data.email}</label>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
