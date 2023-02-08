@@ -4,14 +4,15 @@ import "./EmployeeList.style.css"
 import EmployeeModal from './EmployeeModal';
 
 type IProps ={
-    list: IEmployee[]
+    list: IEmployee[];
+    onDeleteClick: (data: IEmployee) => void
 }
 
 const EmployeeList = (props: IProps) => {
     const [showModal, setShowModal] = useState(false);
     const [dataToShow, setDataToShow] = useState(null as IEmployee | null);
 
-    const {list} = props;
+    const {list, onDeleteClick} = props;
 
     const viewEmployee = (data: IEmployee) => {
         setDataToShow(data);
@@ -40,6 +41,11 @@ const EmployeeList = (props: IProps) => {
                             type="button"
                             value="View"
                              onClick={() => viewEmployee(item)}
+                        />
+                          <input
+                            type="button"
+                            value="Delete"
+                            onClick={() => onDeleteClick(item)}
                         />
                         </div>
                     </td>

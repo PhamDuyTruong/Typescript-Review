@@ -34,6 +34,13 @@ const showListPage = () => {
   setShowPage(PageNum.list);
 };
 
+const deleteEmployee = (data: IEmployee) => {
+   const deletedIndex = employeeList.indexOf(data);
+   const tempList = [...employeeList];
+   tempList.splice(deletedIndex, 1);
+   handleEmployeeList(tempList);
+}
+
  
   return (
     <>
@@ -46,7 +53,7 @@ const showListPage = () => {
             { showPage === PageNum.list && (
               <>
                  <input type="button" value="ADD" onClick={onAddEmployeeClick}  className="add-employee-btn"/>
-                <EmployeeList list={employeeList}/>
+                <EmployeeList list={employeeList} onDeleteClick={deleteEmployee}/>
               </>
               )
             }
