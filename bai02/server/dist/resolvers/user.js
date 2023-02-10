@@ -29,10 +29,17 @@ const UserMutationResponse_1 = require("./../types/UserMutationResponse");
 const User_1 = require("./../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
+const RegisterInput_1 = require("./../types/RegisterInput");
+const validateRegisterInput_1 = require("./../utils/validateRegisterInput");
 let UserResolver = class UserResolver {
-    register(email, username, password) {
+    register(registerInput) {
         return __awaiter(this, void 0, void 0, function* () {
+            const validateRegisterInputErrors = (0, validateRegisterInput_1.validateRegisterInput)(registerInput);
+            if (validateRegisterInputErrors !== null) {
+                return Object.assign({ code: 400, success: false }, validateRegisterInputErrors);
+            }
             try {
+                const { username, email, password } = registerInput;
                 const existingUser = yield User_1.User.findOne({ where: [{ username }, { email }] });
                 if (existingUser)
                     return {
@@ -69,11 +76,9 @@ let UserResolver = class UserResolver {
 };
 __decorate([
     (0, type_graphql_1.Mutation)(_returns => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('email')),
-    __param(1, (0, type_graphql_1.Arg)('username')),
-    __param(2, (0, type_graphql_1.Arg)('password')),
+    __param(0, (0, type_graphql_1.Arg)('registerInput')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [RegisterInput_1.RegisterInput]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 UserResolver = __decorate([

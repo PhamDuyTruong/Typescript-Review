@@ -2,16 +2,26 @@ import { UserMutationResponse } from './../types/UserMutationResponse';
 import { User } from './../entities/User';
 import { Mutation, Resolver, Arg } from 'type-graphql';
 import argon2 from 'argon2';
+import { RegisterInput } from './../types/RegisterInput';
+import { validateRegisterInput } from './../utils/validateRegisterInput';
 
 @Resolver()
 export class UserResolver{
     @Mutation(_returns => UserMutationResponse, {nullable: true})
     async register(
-       @Arg('email') email: string,
-       @Arg('username') username: string,
-       @Arg('password') password: string
+       @Arg('registerInput') registerInput: RegisterInput,
+       
     ){
+      const validateRegisterInputErrors = validateRegisterInput(registerInput);
+      if(validateRegisterInputErrors !== null){
+        return {
+            code: 400,
+            success: false,
+            ...validateRegisterInputErrors
+        }
+      }
       try {
+        const {username, email, password} = registerInput
         const existingUser = await User.findOne({where: [{ username }, {email}]})
         if(existingUser) return {
             code: 400,
