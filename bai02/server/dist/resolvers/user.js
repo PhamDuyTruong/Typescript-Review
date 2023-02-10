@@ -25,6 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
+const UserMutationResponse_1 = require("./../types/UserMutationResponse");
 const User_1 = require("./../entities/User");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
@@ -32,26 +33,42 @@ let UserResolver = class UserResolver {
     register(email, username, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const existingUser = yield User_1.User.findOne({ where: { username } });
+                const existingUser = yield User_1.User.findOne({ where: [{ username }, { email }] });
                 if (existingUser)
-                    return null;
+                    return {
+                        code: 400,
+                        success: false,
+                        message: 'Duplicated username or email',
+                        errors: [
+                            { field: existingUser.username === username ? "username" : "email", message: "Username or email already taken" }
+                        ]
+                    };
                 const hashedPass = yield argon2_1.default.hash(password);
                 const newUser = User_1.User.create({
                     username,
                     password: hashedPass,
                     email
                 });
-                return yield User_1.User.save(newUser);
+                const createdUser = yield User_1.User.save(newUser);
+                return {
+                    code: 200,
+                    success: true,
+                    message: "User registration successful",
+                    user: createdUser,
+                };
             }
             catch (error) {
-                console.log(error);
-                return null;
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
             }
         });
     }
 };
 __decorate([
-    (0, type_graphql_1.Mutation)(_returns => User_1.User, { nullable: true }),
+    (0, type_graphql_1.Mutation)(_returns => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)('email')),
     __param(1, (0, type_graphql_1.Arg)('username')),
     __param(2, (0, type_graphql_1.Arg)('password')),
