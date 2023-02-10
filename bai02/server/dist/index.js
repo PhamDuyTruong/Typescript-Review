@@ -17,6 +17,12 @@ require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
 const typeorm_1 = require("typeorm");
 const User_1 = require("./entities/User");
+const Post_1 = require("./entities/Post");
+const apollo_server_express_1 = require("apollo-server-express");
+const type_graphql_1 = require("type-graphql");
+const apollo_server_core_1 = require("apollo-server-core");
+const user_1 = require("./resolvers/user");
+const hello_1 = require("./resolvers/hello");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -25,11 +31,21 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         password: process.env.DB_PASSWORD,
         logging: true,
         synchronize: true,
-        entities: [User_1.User]
+        entities: [User_1.User, Post_1.Post]
     });
     const app = (0, express_1.default)();
-    app.listen(4000, () => {
-        console.log('Server started on port 4000');
+    const apolloServer = new apollo_server_express_1.ApolloServer({
+        schema: yield (0, type_graphql_1.buildSchema)({
+            resolvers: [hello_1.HelloResolver, user_1.UserResolver],
+            validate: false
+        }),
+        plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()]
+    });
+    yield apolloServer.start();
+    apolloServer.applyMiddleware({ app, cors: false });
+    const port = process.env.PORT || 4000;
+    app.listen(port, () => {
+        console.log(`Server started on port 4000. GraphQL server started on localhost:${port}${apolloServer.graphqlPath}`);
     });
 });
 main().catch(error => console.log(error));
