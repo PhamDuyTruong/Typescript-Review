@@ -31,6 +31,7 @@ const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 const RegisterInput_1 = require("./../types/RegisterInput");
 const validateRegisterInput_1 = require("./../utils/validateRegisterInput");
+const LoginInput_1 = require("./../types/LoginInput");
 let UserResolver = class UserResolver {
     register(registerInput) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -73,6 +74,47 @@ let UserResolver = class UserResolver {
             }
         });
     }
+    login({ usernameOrEmail, password }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const existingUser = yield User_1.User.findOne(usernameOrEmail.includes("@") ? { where: { email: usernameOrEmail } } : { where: { username: usernameOrEmail } });
+                if (!existingUser) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "User not found",
+                        errors: [
+                            { field: "usernameOrEmail", message: "Username or email is incorrect" }
+                        ]
+                    };
+                }
+                const validPassword = yield argon2_1.default.verify(existingUser.password, password);
+                if (!validPassword) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "Wrong Password",
+                        errors: [
+                            { field: "password", message: "Incorrect Password" }
+                        ]
+                    };
+                }
+                return {
+                    code: 200,
+                    success: true,
+                    message: "Login successfully",
+                    user: existingUser
+                };
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(_returns => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
@@ -81,6 +123,13 @@ __decorate([
     __metadata("design:paramtypes", [RegisterInput_1.RegisterInput]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_returns => UserMutationResponse_1.UserMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('loginInput')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [LoginInput_1.LoginInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "login", null);
 UserResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], UserResolver);

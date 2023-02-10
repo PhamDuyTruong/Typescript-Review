@@ -34,6 +34,7 @@ const validateRegisterInput = (registerInput) => {
             ]
         };
     }
+    return null;
 };
 exports.validateRegisterInput = validateRegisterInput;
 //# sourceMappingURL=validateRegisterInput.js.map
