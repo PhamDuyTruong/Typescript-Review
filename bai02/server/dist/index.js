@@ -24,6 +24,9 @@ const apollo_server_core_1 = require("apollo-server-core");
 const user_1 = require("./resolvers/user");
 const hello_1 = require("./resolvers/hello");
 const mongoose_1 = __importDefault(require("mongoose"));
+const connect_mongo_1 = __importDefault(require("connect-mongo"));
+const express_session_1 = __importDefault(require("express-session"));
+const constants_1 = require("./constants");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -35,8 +38,23 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         entities: [User_1.User, Post_1.Post]
     });
     const app = (0, express_1.default)();
-    yield mongoose_1.default.connect(`mongodb+srv://edricpham:${process.env.PASSWORD}@cluster0.2fqr7wc.mongodb.net/?retryWrites=true&w=majority`);
+    const URL = `mongodb+srv://edricpham:${process.env.PASSWORD}@cluster0.2fqr7wc.mongodb.net/?retryWrites=true&w=majority`;
+    yield mongoose_1.default.connect(URL);
     console.log("MongoDB connected");
+    app.set('trust proxy', 1);
+    app.use((0, express_session_1.default)({
+        name: constants_1.COOKIE_NAME,
+        store: connect_mongo_1.default.create({ mongoUrl: URL }),
+        cookie: {
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+            secure: constants_1.__prod__,
+            sameSite: 'lax'
+        },
+        secret: process.env.SESSION_SECRET_DEV_PROD,
+        saveUninitialized: false,
+        resave: false
+    }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield (0, type_graphql_1.buildSchema)({
             resolvers: [hello_1.HelloResolver, user_1.UserResolver],
