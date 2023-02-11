@@ -8,27 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HelloResolver = void 0;
+exports.PostMutationResponse = void 0;
+const Post_1 = require("./../entities/Post");
 const type_graphql_1 = require("type-graphql");
-let HelloResolver = class HelloResolver {
-    hello({ req }) {
-        console.log(req.session.userId);
-        return 'hello world';
-    }
+const FieldError_1 = require("./FieldError");
+const MutationResponse_1 = require("./MutationResponse");
+let PostMutationResponse = class PostMutationResponse {
 };
 __decorate([
-    (0, type_graphql_1.Query)(_returns => String),
-    __param(0, (0, type_graphql_1.Ctx)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], HelloResolver.prototype, "hello", null);
-HelloResolver = __decorate([
-    (0, type_graphql_1.Resolver)()
-], HelloResolver);
-exports.HelloResolver = HelloResolver;
-//# sourceMappingURL=hello.js.map
+    (0, type_graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", Post_1.Post)
+], PostMutationResponse.prototype, "post", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => [FieldError_1.FieldError], { nullable: true }),
+    __metadata("design:type", Array)
+], PostMutationResponse.prototype, "errors", void 0);
+PostMutationResponse = __decorate([
+    (0, type_graphql_1.ObjectType)({ implements: MutationResponse_1.IMutationResponse })
+], PostMutationResponse);
+exports.PostMutationResponse = PostMutationResponse;
+//# sourceMappingURL=PostMutationResponse.js.map

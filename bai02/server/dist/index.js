@@ -27,6 +27,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const express_session_1 = __importDefault(require("express-session"));
 const constants_1 = require("./constants");
+const post_1 = require("./resolvers/post");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -57,7 +58,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield (0, type_graphql_1.buildSchema)({
-            resolvers: [hello_1.HelloResolver, user_1.UserResolver],
+            resolvers: [hello_1.HelloResolver, user_1.UserResolver, post_1.PostResolver],
             validate: false
         }),
         context: ({ req, res }) => ({ req, res }),

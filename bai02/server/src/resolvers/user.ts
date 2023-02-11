@@ -1,3 +1,4 @@
+import { COOKIE_NAME } from './../constants';
 import { UserMutationResponse } from './../types/UserMutationResponse';
 import { User } from './../entities/User';
 import { Mutation, Resolver, Arg, Ctx } from 'type-graphql';
@@ -9,10 +10,10 @@ import { Context } from './../types/Context';
 
 @Resolver()
 export class UserResolver{
-    @Mutation(_returns => UserMutationResponse, {nullable: true})
+    @Mutation(_return => UserMutationResponse, {nullable: true})
     async register(
        @Arg('registerInput') registerInput: RegisterInput,
-       
+       @Ctx() {req}: Context
     ){
       const validateRegisterInputErrors = validateRegisterInput(registerInput);
       if(validateRegisterInputErrors !== null){
@@ -44,6 +45,7 @@ export class UserResolver{
 
         const createdUser = await User.save(newUser);
 
+        req.session.userId  = createdUser.id
         return {
             code: 200,
             success: true,
@@ -61,7 +63,7 @@ export class UserResolver{
       }
     }  
     
-    @Mutation(_returns => UserMutationResponse)
+    @Mutation(_return => UserMutationResponse)
     async login(
         @Arg('loginInput') {usernameOrEmail, password}: LoginInput,
         @Ctx() {req}: Context
@@ -108,5 +110,22 @@ export class UserResolver{
                 message: `Internal server error`,
             };
         }
+    }
+
+    @Mutation(_return => Boolean)
+    async logout(
+        @Ctx() {req, res}: Context
+    ){
+        return new Promise((resolve, _reject) => {
+            res.clearCookie(COOKIE_NAME)
+            req.session.destroy(error => {
+                if(error){
+                    console.log(error)
+                    resolve(false)
+                }
+                resolve(true)
+            })
+        })
+       
     }
 }
