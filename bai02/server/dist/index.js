@@ -60,6 +60,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             resolvers: [hello_1.HelloResolver, user_1.UserResolver],
             validate: false
         }),
+        context: ({ req, res }) => ({ req, res }),
         plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()]
     });
     yield apolloServer.start();

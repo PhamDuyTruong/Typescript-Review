@@ -1,10 +1,11 @@
 import { UserMutationResponse } from './../types/UserMutationResponse';
 import { User } from './../entities/User';
-import { Mutation, Resolver, Arg } from 'type-graphql';
+import { Mutation, Resolver, Arg, Ctx } from 'type-graphql';
 import argon2 from 'argon2';
 import { RegisterInput } from './../types/RegisterInput';
 import { validateRegisterInput } from './../utils/validateRegisterInput';
 import { LoginInput } from './../types/LoginInput';
+import { Context } from './../types/Context';
 
 @Resolver()
 export class UserResolver{
@@ -61,7 +62,10 @@ export class UserResolver{
     }  
     
     @Mutation(_returns => UserMutationResponse)
-    async login(@Arg('loginInput') {usernameOrEmail, password}: LoginInput){
+    async login(
+        @Arg('loginInput') {usernameOrEmail, password}: LoginInput,
+        @Ctx() {req}: Context
+        ){
      
         try {
             const existingUser = await User.findOne(usernameOrEmail.includes("@") ? {where: {email: usernameOrEmail}} : {where: {username: usernameOrEmail}});
@@ -86,6 +90,10 @@ export class UserResolver{
                     ]
                 }
             }
+
+            // session: userId == existingUser
+            req.session.userId = existingUser.id
+
 
             return {
                 code: 200,

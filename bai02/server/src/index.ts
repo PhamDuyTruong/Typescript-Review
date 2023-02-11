@@ -13,6 +13,7 @@ import mongoose from 'mongoose'
 import MongoStore from 'connect-mongo'
 import session from 'express-session';
 import {COOKIE_NAME, __prod__} from './constants'
+import {Context} from './types/Context'
 
 const main = async () => {
     await createConnection({
@@ -42,7 +43,7 @@ const main = async () => {
             maxAge: 1000 * 60 * 60, // 1 giờ
             httpOnly: true,
             secure: __prod__, // cookie only works in https
-            sameSite: 'lax' // CRSF
+            sameSite: 'lax' // CSRF
         },
         secret: process.env.SESSION_SECRET_DEV_PROD as string,
         saveUninitialized: false, // don't save empty sessions, right from the start
@@ -55,6 +56,7 @@ const main = async () => {
             resolvers: [HelloResolver, UserResolver],
             validate: false
         }),
+        context: ({req, res}): Context => ({req, res}),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
     });
 
