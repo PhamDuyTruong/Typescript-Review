@@ -23,6 +23,7 @@ const type_graphql_1 = require("type-graphql");
 const apollo_server_core_1 = require("apollo-server-core");
 const user_1 = require("./resolvers/user");
 const hello_1 = require("./resolvers/hello");
+const mongoose_1 = __importDefault(require("mongoose"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -34,6 +35,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         entities: [User_1.User, Post_1.Post]
     });
     const app = (0, express_1.default)();
+    yield mongoose_1.default.connect(`mongodb+srv://edricpham:${process.env.PASSWORD}@cluster0.2fqr7wc.mongodb.net/?retryWrites=true&w=majority`);
+    console.log("MongoDB connected");
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield (0, type_graphql_1.buildSchema)({
             resolvers: [hello_1.HelloResolver, user_1.UserResolver],

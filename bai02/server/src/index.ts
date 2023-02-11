@@ -9,6 +9,7 @@ import { buildSchema } from "type-graphql";
 import {ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core'
 import { UserResolver } from "./resolvers/user";
 import { HelloResolver } from "./resolvers/hello";
+import mongoose from 'mongoose'
 
 const main = async () => {
     await createConnection({
@@ -23,6 +24,9 @@ const main = async () => {
 
     const app = express();
 
+    // Session/cookies
+    await mongoose.connect(`mongodb+srv://edricpham:${process.env.PASSWORD}@cluster0.2fqr7wc.mongodb.net/?retryWrites=true&w=majority`);
+    console.log("MongoDB connected")
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
             resolvers: [HelloResolver, UserResolver],
