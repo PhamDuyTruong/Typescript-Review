@@ -26,6 +26,7 @@ const Post_1 = require("./../entities/Post");
 const type_graphql_1 = require("type-graphql");
 const PostMutationResponse_1 = require("./../types/PostMutationResponse");
 const CreatePostInput_1 = require("./../types/CreatePostInput");
+const UpdatePostInput_1 = require("./../types/UpdatePostInput");
 let PostResolver = class PostResolver {
     createPost({ title, text }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -53,13 +54,52 @@ let PostResolver = class PostResolver {
     }
     posts() {
         return __awaiter(this, void 0, void 0, function* () {
-            return Post_1.Post.find();
+            try {
+                return Post_1.Post.find();
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
         });
     }
     post(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const post = yield Post_1.Post.findOne({ where: { id } });
-            return post;
+            try {
+                const post = yield Post_1.Post.findOne({ where: { id } });
+                return post;
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error`,
+                };
+            }
+        });
+    }
+    updatePost({ id, title, text }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const existingPost = yield Post_1.Post.findOne({ where: { id } });
+            if (!existingPost) {
+                return {
+                    code: 400,
+                    success: false,
+                    message: "Post is not found"
+                };
+            }
+            existingPost.title = title;
+            existingPost.text = text;
+            yield existingPost.save();
+            return {
+                code: 200,
+                success: true,
+                message: "Post updated successfully",
+                post: existingPost
+            };
         });
     }
 };
@@ -71,7 +111,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
 __decorate([
-    (0, type_graphql_1.Query)(_return => [Post_1.Post]),
+    (0, type_graphql_1.Query)(_return => [Post_1.Post], { nullable: true }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -83,6 +123,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "post", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('updatePostInput')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [UpdatePostInput_1.UpdatePostInput]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "updatePost", null);
 PostResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], PostResolver);

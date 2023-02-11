@@ -2,6 +2,7 @@ import { Post } from './../entities/Post';
 import { Mutation, Resolver, Arg, Query, ID} from 'type-graphql';
 import { PostMutationResponse } from './../types/PostMutationResponse';
 import { CreatePostInput } from './../types/CreatePostInput';
+import { UpdatePostInput } from './../types/UpdatePostInput';
 
 @Resolver()
 export class PostResolver{
@@ -33,16 +34,58 @@ export class PostResolver{
    
     }
 
-    @Query(_return => [Post])
+    @Query(_return => [Post], {nullable: true})
     async posts(){
-        return Post.find();
+        try {
+            return Post.find();
+        } catch (error) {
+            return {
+                code: 500,
+                success: false,
+                message: `Internal server error`,
+            };
+        }
+      
     }
 
     @Query(_return => Post, {nullable: true})
     async post(
         @Arg("id", _type=> ID) id: number | undefined
     ){
-        const post = await Post.findOne({where: {id}});
-        return post
+        try {
+            const post = await Post.findOne({where: {id}});
+            return post
+        } catch (error) {
+            return {
+                code: 500,
+                success: false,
+                message: `Internal server error`,
+            };
+        }
+       
+    }
+
+    @Mutation(_return => PostMutationResponse)
+    async updatePost(
+        @Arg('updatePostInput') {id, title, text}: UpdatePostInput 
+    ){
+        const existingPost = await Post.findOne({where: {id}})
+        if(!existingPost){
+            return{
+                code:400,
+                success: false,
+                message: "Post is not found"
+            }
+        }
+        existingPost.title = title;
+        existingPost.text = text;
+        await existingPost.save();
+
+        return {
+            code: 200,
+            success: true,
+            message: "Post updated successfully",
+            post: existingPost
+        }
     }
 }
