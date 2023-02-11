@@ -88,4 +88,25 @@ export class PostResolver{
             post: existingPost
         }
     }
+
+    @Mutation(_return => PostMutationResponse)
+    async deletePost(
+        @Arg('id', _type => ID) id: number
+    ){
+        const existingPost = await Post.findOne({where: {id}})
+        if(!existingPost){
+            return{
+                code:400,
+                success: false,
+                message: "Post is not found"
+            }
+        }
+        await Post.delete({id})
+
+        return {
+            code: 200,
+            success: true,
+            message: "Post deleted successfully"
+        }
+    }
 }

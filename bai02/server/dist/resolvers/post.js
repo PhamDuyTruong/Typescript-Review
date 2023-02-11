@@ -102,6 +102,24 @@ let PostResolver = class PostResolver {
             };
         });
     }
+    deletePost(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const existingPost = yield Post_1.Post.findOne({ where: { id } });
+            if (!existingPost) {
+                return {
+                    code: 400,
+                    success: false,
+                    message: "Post is not found"
+                };
+            }
+            yield Post_1.Post.delete({ id });
+            return {
+                code: 200,
+                success: true,
+                message: "Post deleted successfully"
+            };
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
@@ -130,6 +148,13 @@ __decorate([
     __metadata("design:paramtypes", [UpdatePostInput_1.UpdatePostInput]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "updatePost", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)('id', _type => type_graphql_1.ID)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "deletePost", null);
 PostResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], PostResolver);
