@@ -51,6 +51,17 @@ let PostResolver = class PostResolver {
             }
         });
     }
+    posts() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Post_1.Post.find();
+        });
+    }
+    post(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const post = yield Post_1.Post.findOne({ where: { id } });
+            return post;
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
@@ -59,6 +70,19 @@ __decorate([
     __metadata("design:paramtypes", [CreatePostInput_1.CreatePostInput]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
+__decorate([
+    (0, type_graphql_1.Query)(_return => [Post_1.Post]),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "posts", null);
+__decorate([
+    (0, type_graphql_1.Query)(_return => Post_1.Post, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("id", _type => type_graphql_1.ID)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "post", null);
 PostResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], PostResolver);
