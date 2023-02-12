@@ -1,8 +1,10 @@
+import { Context } from './../types/Context';
 import { Post } from './../entities/Post';
-import { Mutation, Resolver, Arg, Query, ID} from 'type-graphql';
+import { Mutation, Resolver, Arg, Query, ID, Ctx} from 'type-graphql';
 import { PostMutationResponse } from './../types/PostMutationResponse';
 import { CreatePostInput } from './../types/CreatePostInput';
 import { UpdatePostInput } from './../types/UpdatePostInput';
+import { AuthenticationError } from 'apollo-server-express';
 
 @Resolver()
 export class PostResolver{
@@ -91,8 +93,12 @@ export class PostResolver{
 
     @Mutation(_return => PostMutationResponse)
     async deletePost(
-        @Arg('id', _type => ID) id: number
+        @Arg('id', _type => ID) id: number,
+        @Ctx() {req}: Context
     ){
+        if(!req.session.userId){
+            throw new AuthenticationError("Not authenticated")
+        }
         const existingPost = await Post.findOne({where: {id}})
         if(!existingPost){
             return{
