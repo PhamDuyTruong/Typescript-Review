@@ -3,37 +3,21 @@ import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import {useMutation} from '@apollo/client'
+import {RegisterInput, useRegisterMutation} from '../generated/graphql'
 
 const Register = () => {
 
-    const initialValues: NewUserInput = { username: "", email: "", password: "" }
+    const initialValues: RegisterInput = { username: "", email: "", password: "" }
 
-    interface UserMutationResponse{
-        code: number
-        success: boolean
-        message: string
-        user: string
-        errors: string
-    }
+    const [registerUser, {loading: _registerUserLoading, data, error}] = useRegisterMutation()
 
-    interface NewUserInput{
-        username: string
-        email: string
-        password: string
-    }
-
-    const [registerUser, {data, error}] = useMutation<
-       {register: UserMutationResponse},
-       {registerInput: NewUserInput}
-    >(registerMutation);
-
-    const handleRegisterSubmit = (values: NewUserInput) => {
-        return registerUser({
+    const handleRegisterSubmit = async (values: RegisterInput) => {
+        const response = await registerUser({
             variables: {
                 registerInput: values
             }
         })
+        console.log(response)
     }
   return (
       <Wrapper>
