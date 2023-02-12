@@ -3,13 +3,46 @@ import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
+import {registerMutation} from '../graphql-client/mutation'
+import {useMutation} from '@apollo/client'
 
 const Register = () => {
+
+    const initialValues: NewUserInput = { username: "", email: "", password: "" }
+
+    interface UserMutationResponse{
+        code: number
+        success: boolean
+        message: string
+        user: string
+        errors: string
+    }
+
+    interface NewUserInput{
+        username: string
+        email: string
+        password: string
+    }
+
+    const [registerUser, {data, error}] = useMutation<
+       {register: UserMutationResponse},
+       {registerInput: NewUserInput}
+    >(registerMutation);
+
+    const handleRegisterSubmit = (values: NewUserInput) => {
+        registerUser({
+            variables: {
+                registerInput: values
+            }
+        })
+    }
   return (
       <Wrapper>
+        {error && <p>Failed to register</p>}
+        {data && data.register.success ? <p>Registered successfully {JSON.stringify(data)}</p> : null}
         <Formik
-        initialValues={{ username: "", password: "" }}
-        onSubmit={(values) => console.log(values)}
+        initialValues={initialValues}
+        onSubmit={handleRegisterSubmit}
       >
         {({isSubmitting}) => (
           <Form>
@@ -18,14 +51,25 @@ const Register = () => {
                 name="username"
                 placeholder="username"
                 label="Username"
+                type="text"
               ></InputField>
                <Box mt="4">
-                    <InputField
+                <InputField
+                    name="email"
+                    placeholder="email"
+                    label="Email"
+                    type="text"
+                ></InputField>
+               </Box>
+               <Box mt="4">
+                <InputField
                     name="password"
                     placeholder="password"
                     label="Password"
-                    ></InputField>
+                    type="password"
+                ></InputField>
                </Box>
+              
               <Button type="submit" colorScheme='teal' mt="4" isLoading={isSubmitting}>
                    Register
               </Button>

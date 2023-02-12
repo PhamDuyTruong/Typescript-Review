@@ -22,6 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
+const checkAuth_1 = require("./../middleware/checkAuth");
 const Post_1 = require("./../entities/Post");
 const type_graphql_1 = require("type-graphql");
 const PostMutationResponse_1 = require("./../types/PostMutationResponse");
@@ -150,6 +151,7 @@ __decorate([
 ], PostResolver.prototype, "updatePost", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    (0, type_graphql_1.UseMiddleware)(checkAuth_1.CheckAuth),
     __param(0, (0, type_graphql_1.Arg)('id', _type => type_graphql_1.ID)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

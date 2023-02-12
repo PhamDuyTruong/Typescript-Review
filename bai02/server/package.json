@@ -13,6 +13,7 @@
   "author": "truong pham",
   "license": "ISC",
   "devDependencies": {
+    "@types/cors": "^2.8.13",
     "@types/node": "^18.13.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
@@ -26,6 +27,7 @@
     "argon2": "^0.30.3",
     "class-validator": "^0.14.0",
     "connect-mongo": "^4.6.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
