@@ -28,6 +28,7 @@ const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const express_session_1 = __importDefault(require("express-session"));
 const constants_1 = require("./constants");
 const post_1 = require("./resolvers/post");
+const cors_1 = __importDefault(require("cors"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -39,6 +40,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         entities: [User_1.User, Post_1.Post]
     });
     const app = (0, express_1.default)();
+    app.use((0, cors_1.default)({
+        origin: "http://localhost:3000",
+        credentials: true
+    }));
     const URL = `mongodb+srv://edricpham:${process.env.PASSWORD}@cluster0.2fqr7wc.mongodb.net/?retryWrites=true&w=majority`;
     yield mongoose_1.default.connect(URL);
     console.log("MongoDB connected");

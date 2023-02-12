@@ -3,7 +3,6 @@ import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import {registerMutation} from '../graphql-client/mutation'
 import {useMutation} from '@apollo/client'
 
 const Register = () => {
@@ -30,7 +29,7 @@ const Register = () => {
     >(registerMutation);
 
     const handleRegisterSubmit = (values: NewUserInput) => {
-        registerUser({
+        return registerUser({
             variables: {
                 registerInput: values
             }

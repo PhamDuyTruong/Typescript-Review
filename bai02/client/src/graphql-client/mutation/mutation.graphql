@@ -1,7 +1,4 @@
-import { gql } from "@apollo/client";
-
-export const registerMutation = gql`
-    mutation Register($registerInput: RegisterInput!){
+mutation Register($registerInput: RegisterInput!){
         register(
             registerInput: $registerInput
           ){
@@ -18,5 +15,4 @@ export const registerMutation = gql`
             message
           }
           }
-    }
-`
+}
