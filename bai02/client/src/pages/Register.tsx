@@ -1,9 +1,10 @@
 import { Box, Button, FormControl } from "@chakra-ui/react";
-import { Formik, Form } from "formik";
+import { Formik, Form, FormikHelpers } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
 import {RegisterInput, useRegisterMutation} from '../generated/graphql'
+import { mapFieldError } from "../helpers/mapFieldErrors";
 
 const Register = () => {
 
@@ -11,13 +12,15 @@ const Register = () => {
 
     const [registerUser, {loading: _registerUserLoading, data, error}] = useRegisterMutation()
 
-    const handleRegisterSubmit = async (values: RegisterInput) => {
+    const handleRegisterSubmit = async (values: RegisterInput, {setErrors}: FormikHelpers<RegisterInput>) => {
         const response = await registerUser({
             variables: {
                 registerInput: values
             }
         })
-        console.log(response)
+        if(response.data?.register.errors){
+           setErrors(mapFieldError(response.data.register.errors))
+        }
     }
   return (
       <Wrapper>
@@ -29,7 +32,7 @@ const Register = () => {
       >
         {({isSubmitting}) => (
           <Form>
-            <FormControl>
+            <FormControl isInvalid={!!error}>
               <InputField
                 name="username"
                 placeholder="username"
