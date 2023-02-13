@@ -1,7 +1,8 @@
-import Register from "./Register"
+import Login from "./Login"
+
 
 const Index = () => (
-  <Register />
+  <h1>Hello World</h1>
 )
 
 export default Index
