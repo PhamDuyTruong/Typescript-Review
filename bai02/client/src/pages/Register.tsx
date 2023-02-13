@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Spinner } from "@chakra-ui/react";
+import { Box, Button, FormControl, Spinner, useToast } from "@chakra-ui/react";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
@@ -10,6 +10,7 @@ import { useChekAuth } from "../utils/useCheckAuth";
 
 const Register = () => {
     const router = useRouter();
+    const toast = useToast();
     const {data: authData, loading: authLoading} = useChekAuth();
 
     const initialValues: RegisterInput = { username: "", email: "", password: "" }
@@ -33,6 +34,13 @@ const Register = () => {
         if(response.data?.register.errors){
            setErrors(mapFieldError(response.data.register.errors))
         }else if(response.data?.register.user){
+          toast({
+            title: 'Welcome.',
+            description: "Login successfully",
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          })      
           router.push('/');
         }
     }
@@ -42,7 +50,6 @@ const Register = () => {
   return (
       <Wrapper>
         {error && <p>Failed to register</p>}
-        {data && data.register.success ? <p>Registered successfully {JSON.stringify(data)}</p> : null}
         <Formik
         initialValues={initialValues}
         onSubmit={handleRegisterSubmit}
