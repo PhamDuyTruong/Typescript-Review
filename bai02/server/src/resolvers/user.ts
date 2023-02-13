@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from './../constants';
 import { UserMutationResponse } from './../types/UserMutationResponse';
 import { User } from './../entities/User';
-import { Mutation, Resolver, Arg, Ctx } from 'type-graphql';
+import { Mutation, Resolver, Arg, Ctx, Query } from 'type-graphql';
 import argon2 from 'argon2';
 import { RegisterInput } from './../types/RegisterInput';
 import { validateRegisterInput } from './../utils/validateRegisterInput';
@@ -10,6 +10,14 @@ import { Context } from './../types/Context';
 
 @Resolver()
 export class UserResolver{
+    @Query(_return => User, {nullable: true})
+    async me(
+        @Ctx() {req}: Context
+    ){
+        if(!req.session.userId) return null;
+        const user = await User.findOne({where: {id: req.session.userId}});
+        return user;
+    }
     @Mutation(_return => UserMutationResponse, {nullable: true})
     async register(
        @Arg('registerInput') registerInput: RegisterInput,

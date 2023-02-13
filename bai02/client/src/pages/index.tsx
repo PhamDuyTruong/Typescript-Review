@@ -1,8 +1,12 @@
-import Login from "./Login"
+import Navbar from "../components/Navbar"
 
 
 const Index = () => (
-  <h1>Hello World</h1>
-)
+  <>
+     <Navbar />
+    <h1>Hello World</h1>
+
+  </>
+)  
 
 export default Index

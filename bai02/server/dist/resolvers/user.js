@@ -34,6 +34,14 @@ const RegisterInput_1 = require("./../types/RegisterInput");
 const validateRegisterInput_1 = require("./../utils/validateRegisterInput");
 const LoginInput_1 = require("./../types/LoginInput");
 let UserResolver = class UserResolver {
+    me({ req }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!req.session.userId)
+                return null;
+            const user = yield User_1.User.findOne({ where: { id: req.session.userId } });
+            return user;
+        });
+    }
     register(registerInput, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const validateRegisterInputErrors = (0, validateRegisterInput_1.validateRegisterInput)(registerInput);
@@ -133,6 +141,13 @@ let UserResolver = class UserResolver {
         });
     }
 };
+__decorate([
+    (0, type_graphql_1.Query)(_return => User_1.User, { nullable: true }),
+    __param(0, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
     __param(0, (0, type_graphql_1.Arg)('registerInput')),
