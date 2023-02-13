@@ -1,4 +1,4 @@
-import { Box, Button, FormControl } from "@chakra-ui/react";
+import { Box, Button, FormControl, Spinner, useToast } from "@chakra-ui/react";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
@@ -6,10 +6,12 @@ import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
 import { LoginInput, MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { mapFieldError } from "../helpers/mapFieldErrors";
+import { useChekAuth } from "../utils/useCheckAuth";
 
 const Login = () => {
     const router = useRouter();
-
+    const toast = useToast();
+    const {data: authData, loading: authLoading} = useChekAuth();
     const initialValues: LoginInput = { usernameOrEmail: "", password: "" }
 
     const [loginUser, {loading: _loginUserLoading, data, error}] = useLoginMutation()
@@ -31,13 +33,23 @@ const Login = () => {
         if(response.data?.login.errors){
            setErrors(mapFieldError(response.data.login.errors))
         }else if(response.data?.login.user){
+            toast({
+                title: 'Welcome.',
+                description: "Login successfully",
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+              })      
           router.push('/');
         }
+    }
+
+    if(authLoading || (!authLoading && authData?.me)){
+        return <Spinner />
     }
   return (
       <Wrapper>
         {error && <p>Failed login. Internal Server</p>}
-        {data && data.login.success ? <p>Login successfully {JSON.stringify(data)}</p> : null}
         <Formik
         initialValues={initialValues}
         onSubmit={handleLoginSubmit}

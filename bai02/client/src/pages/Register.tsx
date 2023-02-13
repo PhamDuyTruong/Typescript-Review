@@ -1,14 +1,16 @@
-import { Box, Button, FormControl } from "@chakra-ui/react";
+import { Box, Button, FormControl, Spinner } from "@chakra-ui/react";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useRouter } from "next/router";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import {RegisterInput, useRegisterMutation} from '../generated/graphql'
+import {MeDocument, MeQuery, RegisterInput, useRegisterMutation} from '../generated/graphql'
 import { mapFieldError } from "../helpers/mapFieldErrors";
+import { useChekAuth } from "../utils/useCheckAuth";
 
 const Register = () => {
     const router = useRouter();
+    const {data: authData, loading: authLoading} = useChekAuth();
 
     const initialValues: RegisterInput = { username: "", email: "", password: "" }
 
@@ -18,7 +20,15 @@ const Register = () => {
         const response = await registerUser({
             variables: {
                 registerInput: values
-            }
+            },
+            update(cache, {data}){
+              if(data?.register.success){
+                  cache.writeQuery<MeQuery>({
+                      query: MeDocument,
+                      data: {me: data.register.user}
+                  })
+              }
+          }
         })
         if(response.data?.register.errors){
            setErrors(mapFieldError(response.data.register.errors))
@@ -26,6 +36,9 @@ const Register = () => {
           router.push('/');
         }
     }
+    if(authLoading || (!authLoading && authData?.me)){
+      return <Spinner />
+  }
   return (
       <Wrapper>
         {error && <p>Failed to register</p>}
