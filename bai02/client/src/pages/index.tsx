@@ -3,6 +3,7 @@ import { PostDocument, usePostsQuery } from "../generated/graphql";
 import { addApolloState, initializeApollo } from "../lib/apolloClient";
 import NextLink from 'next/link';
 import Layout from "../components/Layout";
+import PostEditDeleteButton from "../components/PostEditDeleteButton";
 
 export const limit = 3
 const Index = () => {
@@ -31,9 +32,9 @@ const Index = () => {
                     </NextLink>
                     <Text>Posted by {post.user.username}</Text>
                     <Flex align="center">
-                      <Text mt={4}>{post.text}</Text>
+                      <Text mt={4}>{post.textSnippet}</Text>
                       <Box ml="auto">
-
+                          <PostEditDeleteButton />
                       </Box>
                     </Flex>
                   </Box>

@@ -1,12 +1,25 @@
 import { CheckAuth } from './../middleware/checkAuth';
 import { Post } from './../entities/Post';
-import { Mutation, Resolver, Arg, Query, ID, UseMiddleware} from 'type-graphql';
+import { Mutation, Resolver, Arg, Query, ID, UseMiddleware, FieldResolver, Root} from 'type-graphql';
 import { PostMutationResponse } from './../types/PostMutationResponse';
 import { CreatePostInput } from './../types/CreatePostInput';
 import { UpdatePostInput } from './../types/UpdatePostInput';
+import { User } from './../entities/User';
+import { PaginatedPosts } from './../types/PaginatedPosts';
 
-@Resolver()
+@Resolver(_of => Post)
 export class PostResolver{
+    @FieldResolver(_return => String)
+    textSnippet(@Root() parent: Post){
+        return parent.text.slice(0, 50);
+    }
+
+    @FieldResolver(_return => User)
+    async user(@Root() root: Post){
+        return await User.findOne({where: {id: root.userId}})
+    }
+
+
     @Mutation(_return => PostMutationResponse)
     async createPost(
         @Arg('createPostInput') {title, text}: CreatePostInput
@@ -35,10 +48,16 @@ export class PostResolver{
    
     }
 
-    @Query(_return => [Post], {nullable: true})
+    @Query(_return => PaginatedPosts, {nullable: true})
     async posts(){
         try {
-            return Post.find();
+           const posts = await Post.find();
+           return {
+            totalCount: 5,
+            cursor: new Date(),
+            hasMore: true,
+            paginatedPosts: posts
+           }
         } catch (error) {
             return {
                 code: 500,
