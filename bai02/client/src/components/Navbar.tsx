@@ -31,7 +31,15 @@ const Navbar = () => {
                 
         </>)
     }else{
-        body = <Button onClick={logoutUser} isLoading={useLogoutMutationLoading}>Logout</Button>
+        body =(
+            <Flex>
+                <NextLink href="/create-post">
+                    <Button mr={4}>Create Button</Button>
+                </NextLink>
+                <Button onClick={logoutUser} isLoading={useLogoutMutationLoading}>Logout</Button>
+            </Flex>
+       
+        )
     }
 
   return (

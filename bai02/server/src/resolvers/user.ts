@@ -1,15 +1,22 @@
 import { COOKIE_NAME } from './../constants';
 import { UserMutationResponse } from './../types/UserMutationResponse';
 import { User } from './../entities/User';
-import { Mutation, Resolver, Arg, Ctx, Query } from 'type-graphql';
+import { Mutation, Resolver, Arg, Ctx, Query, FieldResolver, Root } from 'type-graphql';
 import argon2 from 'argon2';
 import { RegisterInput } from './../types/RegisterInput';
 import { validateRegisterInput } from './../utils/validateRegisterInput';
 import { LoginInput } from './../types/LoginInput';
 import { Context } from './../types/Context';
 
-@Resolver()
+@Resolver(_of => User)
 export class UserResolver{
+
+    @FieldResolver(_return => String)
+    email(@Root() user: User, @Ctx() {req}: Context){
+       return req.session.userId === user.id ? user.email : ""
+    }
+
+
     @Query(_return => User, {nullable: true})
     async me(
         @Ctx() {req}: Context

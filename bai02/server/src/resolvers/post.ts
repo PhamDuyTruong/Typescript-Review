@@ -1,6 +1,7 @@
+import { Context } from './../types/Context';
 import { CheckAuth } from './../middleware/checkAuth';
 import { Post } from './../entities/Post';
-import { Mutation, Resolver, Arg, Query, ID, UseMiddleware, FieldResolver, Root, Int} from 'type-graphql';
+import { Mutation, Resolver, Arg, Query, ID, UseMiddleware, FieldResolver, Root, Int, Ctx} from 'type-graphql';
 import { PostMutationResponse } from './../types/PostMutationResponse';
 import { CreatePostInput } from './../types/CreatePostInput';
 import { UpdatePostInput } from './../types/UpdatePostInput';
@@ -23,13 +24,15 @@ export class PostResolver{
 
     @Mutation(_return => PostMutationResponse)
     async createPost(
-        @Arg('createPostInput') {title, text}: CreatePostInput
+        @Arg('createPostInput') {title, text}: CreatePostInput,
+        @Ctx() {req}: Context
     ){
 
         try {
             const newPost = Post.create({
                 title,
-                text
+                text,
+                userId: req.session.userId
             })
     
             await newPost.save();
@@ -107,7 +110,8 @@ export class PostResolver{
 
     @Mutation(_return => PostMutationResponse)
     async updatePost(
-        @Arg('updatePostInput') {id, title, text}: UpdatePostInput 
+        @Arg('updatePostInput') {id, title, text}: UpdatePostInput,
+        @Ctx() {req}: Context 
     ){
         const existingPost = await Post.findOne({where: {id}})
         if(!existingPost){
@@ -115,6 +119,13 @@ export class PostResolver{
                 code:400,
                 success: false,
                 message: "Post is not found"
+            }
+        }
+        if(existingPost.userId !== req.session.userId){
+            return {
+                code: 401,
+                success: false,
+                message: "Unauthorized"
             }
         }
         existingPost.title = title;
@@ -133,6 +144,7 @@ export class PostResolver{
     @UseMiddleware(CheckAuth)
     async deletePost(
         @Arg('id', _type => ID) id: number,
+        @Ctx() {req}: Context
     ){
         const existingPost = await Post.findOne({where: {id}})
         if(!existingPost){
@@ -140,6 +152,13 @@ export class PostResolver{
                 code:400,
                 success: false,
                 message: "Post is not found"
+            }
+        }
+        if(existingPost.userId !== req.session.userId){
+            return {
+                code: 401,
+                success: false,
+                message: "Unauthorized"
             }
         }
         await Post.delete({id})
