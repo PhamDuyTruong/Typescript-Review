@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { ApolloClient, HttpLink, InMemoryCache, from, NormalizedCacheObject } from '@apollo/client'
 import { onError } from '@apollo/client/link/error'
-import { concatPagination } from '@apollo/client/utilities'
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
+import { Post } from '../generated/graphql'
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 
@@ -35,11 +35,29 @@ function createApolloClient() {
       typePolicies: {
         Query: {
           fields: {
-            allPosts: concatPagination(),
+            posts: {
+              keyArgs: false,
+							merge(existing, incoming) {
+								let paginatedPosts: Post[] = []
+
+								if (existing && existing.paginatedPosts) {
+									paginatedPosts = paginatedPosts.concat(
+										existing.paginatedPosts
+									)
+								}
+
+								if (incoming && incoming.paginatedPosts) {
+									paginatedPosts = paginatedPosts.concat(
+										incoming.paginatedPosts
+									)
+								}
+
+								return { ...incoming, paginatedPosts }
+              }
           },
         },
       },
-    }),
+    }}),
   })
 }
 

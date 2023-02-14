@@ -1,16 +1,20 @@
-import { Box, Flex, Spinner, Stack, Link, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Stack, Link, Heading, Text, Button } from "@chakra-ui/react";
 import { PostDocument, usePostsQuery } from "../generated/graphql";
 import { addApolloState, initializeApollo } from "../lib/apolloClient";
 import NextLink from 'next/link';
 import Layout from "../components/Layout";
 import PostEditDeleteButton from "../components/PostEditDeleteButton";
+import { NetworkStatus } from "@apollo/client";
 
 export const limit = 3
 const Index = () => {
-  const {data, loading} = usePostsQuery({
+  const {data, loading, fetchMore, networkStatus} = usePostsQuery({
     variables: { limit },
 		notifyOnNetworkStatusChange: true
-  })
+  });
+
+  const loadMorePost = () => fetchMore({variables: {cursor: data?.posts?.cursor}});
+  const loadingMorePost = networkStatus === NetworkStatus.fetchMore
 
   return(
   <Layout>
@@ -44,6 +48,13 @@ const Index = () => {
         </Stack>
       )
      }
+     {data?.posts?.hasMore && (
+      <Flex>
+        <Button m="auto" my={8} isLoading={loadingMorePost} onClick={loadMorePost}>
+          {loadingMorePost ? "loading": "Show more"}
+        </Button>
+      </Flex>
+     )}
   </Layout>)
 };
 
@@ -52,6 +63,9 @@ export const getStaticProps = async() => {
 
   await apolloClient.query({
     query: PostDocument,
+    variables: {
+      limit
+    }
   })
 
   return addApolloState(apolloClient, {
