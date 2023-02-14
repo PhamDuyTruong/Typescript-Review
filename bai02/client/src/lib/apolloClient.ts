@@ -4,6 +4,7 @@ import { onError } from '@apollo/client/link/error'
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
 import { Post } from '../generated/graphql'
+import  Router from 'next/router'
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 
@@ -12,14 +13,15 @@ interface IApolloStateProps{
     [APOLLO_STATE_PROP_NAME]?: NormalizedCacheObject
 }
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
-    )
-  if (networkError) console.log(`[Network error]: ${networkError}`)
+const errorLink = onError(errors => {
+	if (
+		errors.graphQLErrors &&
+		errors.graphQLErrors[0].extensions?.code === 'UNAUTHENTICATED' &&
+		errors.response
+	) {
+		errors.response.errors = undefined
+		Router.replace("/Login")
+	}
 })
 
 const httpLink = new HttpLink({

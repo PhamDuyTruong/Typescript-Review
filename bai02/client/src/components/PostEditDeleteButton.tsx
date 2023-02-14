@@ -1,5 +1,5 @@
 import { EditIcon } from '@chakra-ui/icons'
-import { DeleteIcon } from '@chakra-ui/icons/dist/Delete'
+import { DeleteIcon } from '@chakra-ui/icons'
 import { Box, IconButton } from '@chakra-ui/react'
 import React from 'react'
 

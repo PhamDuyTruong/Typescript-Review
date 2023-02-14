@@ -6,12 +6,12 @@ import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
 import {MeDocument, MeQuery, RegisterInput, useRegisterMutation} from '../generated/graphql'
 import { mapFieldError } from "../helpers/mapFieldErrors";
-import { useChekAuth } from "../utils/useCheckAuth";
+import { useCheckAuth } from "../utils/useCheckAuth";
 
 const Register = () => {
     const router = useRouter();
     const toast = useToast();
-    const {data: authData, loading: authLoading} = useChekAuth();
+    const {data: authData, loading: authLoading} = useCheckAuth();
 
     const initialValues: RegisterInput = { username: "", email: "", password: "" }
 

@@ -34,6 +34,9 @@ const RegisterInput_1 = require("./../types/RegisterInput");
 const validateRegisterInput_1 = require("./../utils/validateRegisterInput");
 const LoginInput_1 = require("./../types/LoginInput");
 let UserResolver = class UserResolver {
+    email(user, { req }) {
+        return req.session.userId === user.id ? user.email : "";
+    }
     me({ req }) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!req.session.userId)
@@ -142,6 +145,14 @@ let UserResolver = class UserResolver {
     }
 };
 __decorate([
+    (0, type_graphql_1.FieldResolver)(_return => String),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [User_1.User, Object]),
+    __metadata("design:returntype", void 0)
+], UserResolver.prototype, "email", null);
+__decorate([
     (0, type_graphql_1.Query)(_return => User_1.User, { nullable: true }),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
@@ -172,7 +183,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "logout", null);
 UserResolver = __decorate([
-    (0, type_graphql_1.Resolver)()
+    (0, type_graphql_1.Resolver)(_of => User_1.User)
 ], UserResolver);
 exports.UserResolver = UserResolver;
 //# sourceMappingURL=user.js.map

@@ -12,7 +12,7 @@ export class PaginatedPosts{
     @Field()
     hasMore!: boolean
 
-    @Field()
+    @Field(_type => [Post])
     paginatedPosts !: Post[]
 
 }

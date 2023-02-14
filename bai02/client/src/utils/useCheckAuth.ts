@@ -8,7 +8,7 @@ export const useCheckAuth = () => {
         if(!loading && data?.me && (router.route === '/Login' || router.route === "/Register")){
             router.replace('/');
         }else if(!data?.me){
-            router.replace("/login");
+            router.replace("/Login");
         }
     }, [data, loading, router]);
 

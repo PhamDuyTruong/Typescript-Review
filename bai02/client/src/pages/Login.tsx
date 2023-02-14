@@ -6,12 +6,13 @@ import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
 import { LoginInput, MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { mapFieldError } from "../helpers/mapFieldErrors";
-import { useChekAuth } from "../utils/useCheckAuth";
+import { initializeApollo } from "../lib/apolloClient";
+import { useCheckAuth } from "../utils/useCheckAuth";
 
 const Login = () => {
     const router = useRouter();
     const toast = useToast();
-    const {data: authData, loading: authLoading} = useChekAuth();
+    const {data: authData, loading: authLoading} = useCheckAuth();
     const initialValues: LoginInput = { usernameOrEmail: "", password: "" }
 
     const [loginUser, {loading: _loginUserLoading, data, error}] = useLoginMutation()
@@ -39,7 +40,10 @@ const Login = () => {
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
-              })      
+              })
+              const apolloClient = initializeApollo()
+			       apolloClient.resetStore()
+
           router.push('/');
         }
     }
