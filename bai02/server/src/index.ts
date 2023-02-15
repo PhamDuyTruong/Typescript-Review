@@ -63,7 +63,10 @@ const main = async () => {
             resolvers: [HelloResolver, UserResolver, PostResolver],
             validate: false
         }),
-        context: ({req, res}): Context => ({req, res}),
+        context: ({ req, res }): Context => ({
+			req,
+			res
+		}),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
     });
 

@@ -15,7 +15,7 @@ const Register = () => {
 
     const initialValues: RegisterInput = { username: "", email: "", password: "" }
 
-    const [registerUser, {loading: _registerUserLoading, data, error}] = useRegisterMutation()
+    const [registerUser, {loading: _registerUserLoading, error}] = useRegisterMutation()
 
     const handleRegisterSubmit = async (values: RegisterInput, {setErrors}: FormikHelpers<RegisterInput>) => {
         const response = await registerUser({

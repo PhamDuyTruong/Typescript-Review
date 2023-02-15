@@ -7,7 +7,7 @@ export class PaginatedPosts{
     totalCount!: number
 
     @Field(_type => Date)
-    cursor: Date
+    cursor!: Date
 
     @Field()
     hasMore!: boolean

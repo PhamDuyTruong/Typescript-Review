@@ -1,5 +1,5 @@
-query Me{
-  me{
-   ...userInfo
-  }
+query Me {
+	me {
+		...userInfo
+	}
 }

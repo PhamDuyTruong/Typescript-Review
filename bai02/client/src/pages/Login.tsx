@@ -15,7 +15,7 @@ const Login = () => {
     const {data: authData, loading: authLoading} = useCheckAuth();
     const initialValues: LoginInput = { usernameOrEmail: "", password: "" }
 
-    const [loginUser, {loading: _loginUserLoading, data, error}] = useLoginMutation()
+    const [loginUser, {loading: _loginUserLoading, error}] = useLoginMutation()
 
     const handleLoginSubmit = async (values: LoginInput, {setErrors}: FormikHelpers<LoginInput>) => {
         const response = await loginUser({

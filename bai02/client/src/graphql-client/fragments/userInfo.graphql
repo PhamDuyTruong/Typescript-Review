@@ -1,5 +1,5 @@
-fragment userInfo on User{
-    id
-    username
-    email
+fragment userInfo on User {
+	id
+	username
+	email
 }

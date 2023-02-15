@@ -26,8 +26,8 @@ __decorate([
     __metadata("design:type", String)
 ], Post.prototype, "title", void 0);
 __decorate([
-    (0, type_graphql_1.Field)({ nullable: true }),
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Post.prototype, "userId", void 0);
 __decorate([

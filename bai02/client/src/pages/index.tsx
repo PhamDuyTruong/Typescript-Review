@@ -1,12 +1,13 @@
 import { Box, Flex, Spinner, Stack, Link, Heading, Text, Button } from "@chakra-ui/react";
-import { PostDocument, usePostsQuery } from "../generated/graphql";
-import { addApolloState, initializeApollo } from "../lib/apolloClient";
+import { PostsDocument, usePostsQuery } from "../generated/graphql";
+import {addApolloState, initializeApollo } from "../lib/apolloClient";
 import NextLink from 'next/link';
 import Layout from "../components/Layout";
 import PostEditDeleteButton from "../components/PostEditDeleteButton";
 import { NetworkStatus } from "@apollo/client";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
-export const limit = 3
+export const limit = 3;
 const Index = () => {
   const {data, loading, fetchMore, networkStatus} = usePostsQuery({
     variables: { limit },
@@ -27,7 +28,7 @@ const Index = () => {
               return (
                 <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
                   <Box>
-                    <NextLink href={`/post/${post.id}`}>
+                    <NextLink href="">
                       <Link>
                         <Heading fontSize='xl'>
                           {post.title}
@@ -58,11 +59,13 @@ const Index = () => {
   </Layout>)
 };
 
-export const getStaticProps = async() => {
-  const apolloClient = initializeApollo()
+export const  getServerSideProps: GetServerSideProps = async(
+  context: GetServerSidePropsContext
+) => {
+  const apolloClient = initializeApollo({ headers: context.req.headers })
 
   await apolloClient.query({
-    query: PostDocument,
+    query: PostsDocument,
     variables: {
       limit
     }
