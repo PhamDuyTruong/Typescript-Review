@@ -28,6 +28,7 @@ const PostEdit = () => {
                 }
             }
         })
+        router.push("/")
     }
 
     if(meLoading || postLoading){
