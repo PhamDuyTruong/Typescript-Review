@@ -26,24 +26,23 @@ const Index = () => {
         <Stack spacing={8}>
             {data?.posts?.paginatedPosts.map(post => {
               return (
-                <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-                  <Box>
-                    <NextLink href="">
-                      <Link>
-                        <Heading fontSize='xl'>
-                          {post.title}
-                        </Heading>
-                      </Link>
-                    </NextLink>
-                    <Text>Posted by {post.user.username}</Text>
-                    <Flex align="center">
-                      <Text mt={4}>{post.textSnippet}</Text>
-                      <Box ml="auto">
-                          <PostEditDeleteButton />
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Flex>
+                <Flex key={post.id} p={5} shadow='md' borderWidth='1px'>
+							<Box flex={1}>
+								<NextLink href={`/post/${post.id}`}>
+									<Link>
+										<Heading fontSize='xl'>{post.title}</Heading>
+									</Link>
+								</NextLink>
+								<Text>posted by {post.user.username}</Text>
+								<Flex align='center'>
+									<Text mt={4}>{post.textSnippet}</Text>
+									<Box ml='auto'>
+										<PostEditDeleteButton
+										/>
+									</Box>
+								</Flex>
+							</Box>
+						</Flex>
               );
             })}
         </Stack>
