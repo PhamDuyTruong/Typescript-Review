@@ -1,12 +1,20 @@
 import { EditIcon } from '@chakra-ui/icons'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { Box, IconButton } from '@chakra-ui/react'
-import React from 'react'
+import React from 'react';
+import NextLink from 'next/link'
 
-const PostEditDeleteButton = () => {
+interface PostEditDeleteButtonsProps {
+	postId: string
+	postUserId: string
+}
+
+const PostEditDeleteButton = ({postId, postUserId}: PostEditDeleteButtonsProps) => {
   return (
     <Box>
-        <IconButton icon={<EditIcon />} aria-label="edit" mr={4}/>
+        <NextLink href={`/post/edit/${postId}`}>
+            <IconButton icon={<EditIcon />} aria-label="edit" mr={4}/>
+        </NextLink>
         <IconButton icon={<DeleteIcon />} aria-label="delete" colorScheme="red"/>
     </Box>
   )

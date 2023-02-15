@@ -1,11 +1,12 @@
-import { Alert, AlertIcon, AlertTitle, Box, Heading, Spinner } from '@chakra-ui/react';
+import { Alert, AlertIcon, AlertTitle, Box, Button, Flex, Heading, Spinner } from '@chakra-ui/react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router'
 import React from 'react'
 import Layout from '../../components/Layout';
+import PostEditDeleteButton from '../../components/PostEditDeleteButton';
 import { PostDocument, PostIdsDocument, PostIdsQuery, PostQuery, usePostIdsQuery, usePostQuery } from '../../generated/graphql';
 import { addApolloState, initializeApollo } from '../../lib/apolloClient';
-
+import NextLink from 'next/link'
 const  Post = () => {
     const router = useRouter();
     const {data, loading, error} = usePostQuery({variables: {id: router.query.id as string}});
@@ -30,6 +31,15 @@ const  Post = () => {
               <Box mb={4}>
                 {data.post.text}
               </Box>
+              <Flex justifyContent='space-between' alignItems='center'>
+				<PostEditDeleteButton
+					postId={data.post.id}
+					postUserId={data.post.userId.toString()}
+				/>
+				<NextLink href='/'>
+					<Button>Back to Homepage</Button>
+				</NextLink>
+			</Flex>
             </>
         )}
     </Layout>
