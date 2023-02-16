@@ -17,6 +17,7 @@ import {Context} from './types/Context'
 import { PostResolver } from "./resolvers/post";
 import cors from 'cors'
 import { Upvote } from "./entities/Upvote";
+import { buildDataLoaders } from "./utils/dataLoaders";
 
 const main = async () => {
     const connection = await createConnection({
@@ -69,7 +70,8 @@ const main = async () => {
         context: ({ req, res }): Context => ({
 			req,
 			res,
-            connection
+            connection,
+            dataLoaders: buildDataLoaders()
 		}),
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground()]
     });

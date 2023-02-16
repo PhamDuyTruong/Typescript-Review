@@ -6,6 +6,7 @@ import Layout from "../components/Layout";
 import PostEditDeleteButton from "../components/PostEditDeleteButton";
 import { NetworkStatus } from "@apollo/client";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import UpvoteSection from "../components/UpvoteSection";
 
 export const limit = 3;
 const Index = () => {
@@ -27,6 +28,7 @@ const Index = () => {
             {data?.posts?.paginatedPosts.map(post => {
               return (
                 <Flex key={post.id} p={5} shadow='md' borderWidth='1px'>
+                  <UpvoteSection post={post}/>
 							<Box flex={1}>
 								<NextLink href={`/post/${post.id}`}>
 									<Link>
