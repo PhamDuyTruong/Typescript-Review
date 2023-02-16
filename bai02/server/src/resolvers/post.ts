@@ -35,10 +35,6 @@ export class PostResolver{
 		@Ctx() { req, dataLoaders: { voteTypeLoader } }: Context
 	) {
 		if (!req.session.userId) return 0
-		// const existingVote = await Upvote.findOne({
-		// 	postId: root.id,
-		// 	userId: req.session.userId
-		// })
 
 		const existingVote = await voteTypeLoader.load({
 			postId: root.id,

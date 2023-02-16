@@ -46,6 +46,17 @@ let PostResolver = class PostResolver {
             return yield User_1.User.findOne({ where: { id: root.userId } });
         });
     }
+    voteType(root, { req, dataLoaders: { voteTypeLoader } }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!req.session.userId)
+                return 0;
+            const existingVote = yield voteTypeLoader.load({
+                postId: root.id,
+                userId: req.session.userId
+            });
+            return existingVote ? existingVote.value : 0;
+        });
+    }
     createPost({ title, text }, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -220,6 +231,14 @@ __decorate([
     __metadata("design:paramtypes", [Post_1.Post]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "user", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(_return => type_graphql_1.Int),
+    __param(0, (0, type_graphql_1.Root)()),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Post_1.Post, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "voteType", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
     __param(0, (0, type_graphql_1.Arg)('createPostInput')),

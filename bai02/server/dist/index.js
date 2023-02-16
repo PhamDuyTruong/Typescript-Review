@@ -30,6 +30,7 @@ const constants_1 = require("./constants");
 const post_1 = require("./resolvers/post");
 const cors_1 = __importDefault(require("cors"));
 const Upvote_1 = require("./entities/Upvote");
+const dataLoaders_1 = require("./utils/dataLoaders");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const connection = yield (0, typeorm_1.createConnection)({
         type: 'postgres',
@@ -72,7 +73,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         context: ({ req, res }) => ({
             req,
             res,
-            connection
+            connection,
+            dataLoaders: (0, dataLoaders_1.buildDataLoaders)()
         }),
         plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()]
     });
