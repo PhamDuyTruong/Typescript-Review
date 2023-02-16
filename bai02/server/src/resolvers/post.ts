@@ -1,13 +1,21 @@
+import { Upvote } from './../entities/Upvote';
 import { Context } from './../types/Context';
 import { CheckAuth } from './../middleware/checkAuth';
 import { Post } from './../entities/Post';
-import { Mutation, Resolver, Arg, Query, ID, UseMiddleware, FieldResolver, Root, Int, Ctx} from 'type-graphql';
+import { Mutation, Resolver, Arg, Query, ID, UseMiddleware, FieldResolver, Root, Int, Ctx, registerEnumType} from 'type-graphql';
 import { PostMutationResponse } from './../types/PostMutationResponse';
 import { CreatePostInput } from './../types/CreatePostInput';
 import { UpdatePostInput } from './../types/UpdatePostInput';
 import { User } from './../entities/User';
 import { PaginatedPosts } from './../types/PaginatedPosts';
 import { LessThan } from 'typeorm';
+import {VoteType} from '../types/VoteType'
+import { UserInputError } from 'apollo-server-core';
+
+registerEnumType(VoteType, {
+	name: 'VoteType' // this one is mandatory
+})
+
 
 @Resolver(_of => Post)
 export class PostResolver{
@@ -168,5 +176,59 @@ export class PostResolver{
             success: true,
             message: "Post deleted successfully"
         }
+    }
+
+    @Mutation(_return => PostMutationResponse)
+    @UseMiddleware(CheckAuth)
+    async vote(
+        @Arg('postId', _type => Int) postId: number,
+        @Arg("inputVoteValue", _type => VoteType) inputVoteValue: VoteType,
+        @Ctx()
+		{
+			req: {
+				session: { userId }
+			},
+			connection
+		}: Context
+    ) {
+        return await connection.transaction(async transactionEntityManager => {
+            let post = await transactionEntityManager.findOne(Post, {where: {id: postId}})
+            if(!post){
+                throw new UserInputError("Post not found")
+            }
+
+            const existingVote = await transactionEntityManager.findOne(Upvote,  {where: {postId: postId, userId: userId}})
+
+            if (existingVote && existingVote.value !== inputVoteValue) {
+				await transactionEntityManager.save(Upvote, {
+					...existingVote,
+					value: inputVoteValue
+				})
+
+				post = await transactionEntityManager.save(Post, {
+					...post,
+					points: post.points + 2 * inputVoteValue
+				})
+			}
+
+            if (!existingVote) {
+				const newVote = transactionEntityManager.create(Upvote, {
+					userId,
+					postId,
+					value: inputVoteValue
+				})
+				await transactionEntityManager.save(newVote)
+
+				post.points = post.points + inputVoteValue
+				post = await transactionEntityManager.save(post)
+			}
+
+            return {
+				code: 200,
+				success: true,
+				message: 'Post voted',
+				post
+			}
+        })
     }
 }

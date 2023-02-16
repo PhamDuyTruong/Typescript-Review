@@ -29,16 +29,19 @@ const express_session_1 = __importDefault(require("express-session"));
 const constants_1 = require("./constants");
 const post_1 = require("./resolvers/post");
 const cors_1 = __importDefault(require("cors"));
+const Upvote_1 = require("./entities/Upvote");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, typeorm_1.createConnection)({
+    const connection = yield (0, typeorm_1.createConnection)({
         type: 'postgres',
         database: 'reddit',
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         logging: true,
         synchronize: true,
-        entities: [User_1.User, Post_1.Post]
+        entities: [User_1.User, Post_1.Post, Upvote_1.Upvote]
     });
+    if (constants_1.__prod__)
+        yield connection.runMigrations();
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
         origin: "http://localhost:3000",
@@ -68,7 +71,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }),
         context: ({ req, res }) => ({
             req,
-            res
+            res,
+            connection
         }),
         plugins: [(0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()]
     });

@@ -22,6 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
+const Upvote_1 = require("./../entities/Upvote");
 const checkAuth_1 = require("./../middleware/checkAuth");
 const Post_1 = require("./../entities/Post");
 const type_graphql_1 = require("type-graphql");
@@ -31,6 +32,11 @@ const UpdatePostInput_1 = require("./../types/UpdatePostInput");
 const User_1 = require("./../entities/User");
 const PaginatedPosts_1 = require("./../types/PaginatedPosts");
 const typeorm_1 = require("typeorm");
+const VoteType_1 = require("../types/VoteType");
+const apollo_server_core_1 = require("apollo-server-core");
+(0, type_graphql_1.registerEnumType)(VoteType_1.VoteType, {
+    name: 'VoteType'
+});
 let PostResolver = class PostResolver {
     textSnippet(parent) {
         return parent.text.slice(0, 50);
@@ -168,6 +174,37 @@ let PostResolver = class PostResolver {
             };
         });
     }
+    vote(postId, inputVoteValue, { req: { session: { userId } }, connection }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield connection.transaction((transactionEntityManager) => __awaiter(this, void 0, void 0, function* () {
+                let post = yield transactionEntityManager.findOne(Post_1.Post, { where: { id: postId } });
+                if (!post) {
+                    throw new apollo_server_core_1.UserInputError("Post not found");
+                }
+                const existingVote = yield transactionEntityManager.findOne(Upvote_1.Upvote, { where: { postId: postId, userId: userId } });
+                if (existingVote && existingVote.value !== inputVoteValue) {
+                    yield transactionEntityManager.save(Upvote_1.Upvote, Object.assign(Object.assign({}, existingVote), { value: inputVoteValue }));
+                    post = yield transactionEntityManager.save(Post_1.Post, Object.assign(Object.assign({}, post), { points: post.points + 2 * inputVoteValue }));
+                }
+                if (!existingVote) {
+                    const newVote = transactionEntityManager.create(Upvote_1.Upvote, {
+                        userId,
+                        postId,
+                        value: inputVoteValue
+                    });
+                    yield transactionEntityManager.save(newVote);
+                    post.points = post.points + inputVoteValue;
+                    post = yield transactionEntityManager.save(post);
+                }
+                return {
+                    code: 200,
+                    success: true,
+                    message: 'Post voted',
+                    post
+                };
+            }));
+        });
+    }
 };
 __decorate([
     (0, type_graphql_1.FieldResolver)(_return => String),
@@ -223,6 +260,16 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "deletePost", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => PostMutationResponse_1.PostMutationResponse),
+    (0, type_graphql_1.UseMiddleware)(checkAuth_1.CheckAuth),
+    __param(0, (0, type_graphql_1.Arg)('postId', _type => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)("inputVoteValue", _type => VoteType_1.VoteType)),
+    __param(2, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostResolver.prototype, "vote", null);
 PostResolver = __decorate([
     (0, type_graphql_1.Resolver)(_of => Post_1.Post)
 ], PostResolver);
