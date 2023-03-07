@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const typeDefs = require("./schema/schema");
 const resolvers = require("./resolver/resolver");
 require("dotenv").config();
+const mongoDataMethods = require("./data/db");
+
 
 const connectToDB = async() => {
     try {
@@ -25,6 +27,7 @@ async function startServer() {
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
+        context: () => ({mongoDataMethods})
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({ app });
