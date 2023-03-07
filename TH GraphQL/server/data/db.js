@@ -2,7 +2,7 @@ const Book = require("../Models/Book");
 const Author = require("../Models/Author");
 
 const mongoDataMethods = {
-    getAllBooks: async () => await Book.find(),
+    getAllBooks: async (condition = null) => condition === null ? await Book.find() : await Book.find(condition),
     getAllAuthors: async() => await Author.find(),
     getBookById: async(id) => await Book.findById(id),
     getAuthorById: async(id) => await Author.findById(id),
