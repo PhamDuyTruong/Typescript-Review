@@ -28,6 +28,15 @@ const getDetailBookById = gql`
         }
     }
 
+`;
+
+const getAuthors = gql`
+    query getAuthorQuery{
+        authors{
+            name
+            id
+        }
+    }
 `
 
-export {getBooks, getDetailBookById}
+export {getBooks, getDetailBookById, getAuthors}

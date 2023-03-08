@@ -7,12 +7,13 @@ const BookDetails = ({bookId}) => {
     const {loading, error, data} = useQuery(getDetailBookById, {
         variables: {
             id: bookId
-        }
+        },
+        skip: bookId === null
     });
     if(loading) return (<p>Loading...</p>)
     if(bookId !== null && error) return (<p>Error !!!</p>)
 
-    const book = !loading && !error ? data.book : null;
+    const book = bookId !== null ? data.book : null;
 
   return (
     <Card bg='info' text='white' className='shadow'>
