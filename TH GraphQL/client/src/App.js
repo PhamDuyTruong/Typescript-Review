@@ -1,7 +1,12 @@
 import Container from 'react-bootstrap/Container'
-import BookList from '../components/BookList';
-import Forms from '../components/Forms'
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import BookList from './components/BookList';
+import Forms from './components/Forms'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+const client = new ApolloClient({
+	url: 'http://localhost:4000/graphql',
+	cache: new InMemoryCache()
+})
 
 function App() {
 	return (
