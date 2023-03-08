@@ -10,4 +10,24 @@ const getBooks = gql`
 
 `;
 
-export {getBooks}
+const getDetailBookById = gql`
+    query getDetailBookById($id: ID!){
+        book(id: $id){
+            id
+            name
+            genre
+            author{
+                id
+                name
+                age
+                books{
+                    id
+                    name
+                }
+            }
+        }
+    }
+
+`
+
+export {getBooks, getDetailBookById}
