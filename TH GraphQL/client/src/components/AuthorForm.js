@@ -26,10 +26,11 @@ const AuthorForm = () => {
         createAuthor({
             variables: {
                 name: newAuthor.name,
-                age: newAuthor.age,
+                age: parseInt(newAuthor.age),
             },
             refetchQueries: [{query: getAuthors}]
         });
+
         setNewAuthor({
             name: '',
             age:''

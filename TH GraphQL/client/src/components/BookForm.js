@@ -18,6 +18,7 @@ const BookForm = () => {
             [e.target.name]: e.target.value
         })
     }
+    
        //Query
        const {loading, data} = useQuery(getAuthors);
 
