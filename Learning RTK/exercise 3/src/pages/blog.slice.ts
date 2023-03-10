@@ -47,6 +47,20 @@ export const addPost = createAsyncThunk('blog/addPost', async (body: Omit<Post, 
       }
 });
 
+export const updatePost = createAsyncThunk("blog/updatePost", async ({ postId, body }: { postId: string; body: Post }, thunkAPI) => {
+    try {
+        const response = await http.put<Post>(`posts/${postId}`, body, {
+          signal: thunkAPI.signal
+        })
+        return response.data
+      } catch (error: any) {
+        if (error.name === 'AxiosError' && error.response.status === 422) {
+          return thunkAPI.rejectWithValue(error.response.data)
+        }
+        throw error
+      }
+})
+
 const blogSlice = createSlice({
     name: "blog",
     initialState,
@@ -84,6 +98,15 @@ const blogSlice = createSlice({
           })
           .addCase(addPost.fulfilled, (state, action) => {
             state.postList.push(action.payload)
+          }).addCase(updatePost.fulfilled, (state, action) => {
+            state.postList.find((post, index) => {
+                if(post.id === action.payload.id){
+                    state.postList[index] = action.payload;
+                    return true
+                }
+                return false
+            })
+            state.editingPost = null
           })
           .addMatcher<PendingAction>(
             (action) => action.type.endsWith('/pending'),

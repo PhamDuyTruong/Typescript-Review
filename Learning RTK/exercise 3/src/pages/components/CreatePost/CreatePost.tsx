@@ -1,7 +1,7 @@
 import React, {useState, useEffect, Fragment} from 'react'
 import { Post } from '../../../types/blog.type';
 import {useDispatch, useSelector} from 'react-redux'
-import { addPost, cancelEditingPost, finishEditingPost } from '../../blog.slice';
+import { addPost, cancelEditingPost, updatePost } from '../../blog.slice';
 import { RootState, useAppDispatch } from 'store';
 
 interface ErrorForm {
@@ -30,7 +30,17 @@ const CreatePost = () => {
     const handleSubmit = async (e:  React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (editingPost) {
-            dispatch(finishEditingPost(formData))
+            dispatch(updatePost({
+              postId: editingPost.id,
+              body: formData
+            })).unwrap().then(() => {
+              setFormData(intialState)
+              if (errorForm) {
+                setErrorForm(null)
+              }
+            }).catch((error) => {
+              setErrorForm(error.error)
+            })
         } else {
             try {
               await dispatch(addPost(formData)).unwrap()
@@ -46,7 +56,7 @@ const CreatePost = () => {
     };
 
     const handleCancelEditing = () => {
-       
+       dispatch(cancelEditingPost());
     }
   return (
     <form onSubmit={handleSubmit} onReset={handleCancelEditing}>
