@@ -59,19 +59,19 @@ export const updatePost = createAsyncThunk("blog/updatePost", async ({ postId, b
         }
         throw error
       }
+});
+
+export const deletePost = createAsyncThunk("blog/deletePost", async (postId: string, thunkAPI) => {
+    const response = await http.delete<Post>(`posts/${postId}`, {
+        signal: thunkAPI.signal
+      })
+      return response.data
 })
 
 const blogSlice = createSlice({
     name: "blog",
     initialState,
     reducers: {
-        deletePost: (state, action: PayloadAction<string>) => {
-            const postId = action.payload;
-            const foundPostIndex = state.postList.findIndex(post => post.id === postId);
-            if(foundPostIndex !== -1){
-                state.postList.splice(foundPostIndex, 1);
-            }
-        },
         startEditingPost: (state, action: PayloadAction<string>) => {
             const postId = action.payload
             const foundPost = state.postList.find((post) => post.id === postId) || null
@@ -107,6 +107,12 @@ const blogSlice = createSlice({
                 return false
             })
             state.editingPost = null
+          }).addCase(deletePost.fulfilled, (state, action) => {
+            const postId = action.meta.arg
+            const deletePostIndex = state.postList.findIndex((post) => post.id === postId)
+            if (deletePostIndex !== -1) {
+              state.postList.splice(deletePostIndex, 1)
+            }
           })
           .addMatcher<PendingAction>(
             (action) => action.type.endsWith('/pending'),
@@ -153,7 +159,7 @@ const blogSlice = createSlice({
 //     })
 // });
 
-export const {deletePost, cancelEditingPost,startEditingPost, finishEditingPost} = blogSlice.actions;
+export const {cancelEditingPost,startEditingPost, finishEditingPost} = blogSlice.actions;
 
 const blogReducer = blogSlice.reducer
 export default blogReducer
