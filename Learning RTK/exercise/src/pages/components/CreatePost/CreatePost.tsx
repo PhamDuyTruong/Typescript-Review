@@ -14,10 +14,12 @@ const intialState: Post = {
 const CreatePost = () => {
     const [formData, setFormData] = useState<Post>(intialState);
     const dispatch = useDispatch();
+
     const handleSubmit = (e:  React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formDataWithId = {...formData, id: new Date().toISOString()};
-        dispatch(addPost(formDataWithId))
+        dispatch(addPost(formDataWithId));
+        setFormData(intialState)
     }
 
   return (
