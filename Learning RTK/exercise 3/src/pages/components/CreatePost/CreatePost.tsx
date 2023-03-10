@@ -1,8 +1,13 @@
 import React, {useState, useEffect, Fragment} from 'react'
 import { Post } from '../../../types/blog.type';
 import {useDispatch, useSelector} from 'react-redux'
-import { addPost, cancelEditingPost, finishEditingPost } from '../../blog..slice';
-import { RootState } from 'store';
+import { addPost, cancelEditingPost, finishEditingPost } from '../../blog.slice';
+import { RootState, useAppDispatch } from 'store';
+
+interface ErrorForm {
+  publishDate: string
+}
+
 const intialState: Post = {
     id: '',
     description: '',
@@ -14,26 +19,34 @@ const intialState: Post = {
 
 const CreatePost = () => {
     const [formData, setFormData] = useState<Post>(intialState);
+    const [errorForm, setErrorForm] = useState<null | ErrorForm>(null)
     const editingPost = useSelector((state: RootState) => state.blog.editingPost)
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         setFormData(editingPost || intialState);
     }, [editingPost])
 
-    const handleSubmit = (e:  React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e:  React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (editingPost) {
             dispatch(finishEditingPost(formData))
-          } else {
-            const formDataWithId = { ...formData, id: new Date().toISOString() }
-            dispatch(addPost(formDataWithId))
+        } else {
+            try {
+              await dispatch(addPost(formData)).unwrap()
+              setFormData(intialState)
+              if (errorForm) {
+                setErrorForm(null)
+              }
+            } catch (error: any) {
+              setErrorForm(error.error)
+            }
           }
           setFormData(intialState)
     };
 
     const handleCancelEditing = () => {
-        dispatch(cancelEditingPost())
+       
     }
   return (
     <form onSubmit={handleSubmit} onReset={handleCancelEditing}>

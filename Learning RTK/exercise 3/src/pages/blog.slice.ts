@@ -1,6 +1,7 @@
 import { intialPostList } from '../constants/blog';
 import { Post } from '../types/blog.type';
-import {createReducer, createAction, createSlice, PayloadAction, nanoid, AsyncThunk} from '@reduxjs/toolkit';
+import {createReducer, createAction, createSlice, PayloadAction, nanoid, AsyncThunk, createAsyncThunk} from '@reduxjs/toolkit';
+import http from 'utils/http';
 
 type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>
 
@@ -24,6 +25,27 @@ const initialState: blogState = {
 // export const startEditingPost = createAction<string>('blog/startEditingPost');
 // export const cancelEditingPost = createAction('blog/cancelEditingPost');
 // export const finishEditingPost = createAction<Post>('blog/finishEditingPost');
+
+export const getPostList = createAsyncThunk('blog/getPostList', async (_, thunkAPI) => {
+    const response = await http.get<Post[]>('posts', {
+        signal: thunkAPI.signal
+    });
+    return response.data
+});
+
+export const addPost = createAsyncThunk('blog/addPost', async (body: Omit<Post, 'id'>, thunkAPI) => {
+    try {
+        const response = await http.post<Post>('posts', body, {
+          signal: thunkAPI.signal
+        })
+        return response.data
+      } catch (error: any) {
+        if (error.name === 'AxiosError' && error.response.status === 422) {
+          return thunkAPI.rejectWithValue(error.response.data)
+        }
+        throw error
+      }
+});
 
 const blogSlice = createSlice({
     name: "blog",
@@ -54,26 +76,14 @@ const blogSlice = createSlice({
                 return false;
             })
         },
-        addPost: {
-            reducer: (state, action: PayloadAction<Post>) =>  {
-                const post = action.payload;
-                state.postList.push(post);
-            },
-            prepare: (post: Omit<Post, 'id'>) => {
-                return {
-                    payload: {
-                        ...post,
-                        id: nanoid()
-                    }
-                }
-            }
-        }
-
     },
     extraReducers(builder) {
         builder
-          .addCase('blog/getPostListSuccess', (state, action: any) => {
+          .addCase(getPostList.fulfilled, (state, action) => {
             state.postList = action.payload
+          })
+          .addCase(addPost.fulfilled, (state, action) => {
+            state.postList.push(action.payload)
           })
           .addMatcher<PendingAction>(
             (action) => action.type.endsWith('/pending'),
@@ -120,7 +130,7 @@ const blogSlice = createSlice({
 //     })
 // });
 
-export const {addPost, deletePost, cancelEditingPost,startEditingPost, finishEditingPost} = blogSlice.actions;
+export const {deletePost, cancelEditingPost,startEditingPost, finishEditingPost} = blogSlice.actions;
 
 const blogReducer = blogSlice.reducer
 export default blogReducer
