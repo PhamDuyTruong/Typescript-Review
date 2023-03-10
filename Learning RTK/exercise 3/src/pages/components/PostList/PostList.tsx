@@ -1,12 +1,37 @@
-import { deletePost, startEditingPost } from '../../blog.reducer'
-import React from 'react'
+import { deletePost, startEditingPost } from '../../blog..slice'
+import React, {useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import { RootState } from 'store'
 import PostItem from '../PostItem/PostItem'
+import http from '../../../utils/http'
 
 const PostList = () => {
     const postList = useSelector((state: RootState) => state.blog.postList);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+      const controller = new AbortController();
+      http.get('posts', {
+        signal: controller.signal
+      }).then(res => {
+        const postsListResult = res.data;
+        dispatch({
+          type: 'blog/getPostListSuccess',
+          payload: postsListResult
+        })
+      }).catch((error) => {
+        
+        dispatch({
+          type: "blog/getPostListFailed",
+        })
+      })
+
+      return () => {
+        controller.abort();
+      }
+    }, [])
+
+
     const handleDelete = (postId: string) => {
         dispatch(deletePost(postId))
     }

@@ -1,6 +1,12 @@
-import { intialPostList } from './../constants/blog';
+import { intialPostList } from '../constants/blog';
 import { Post } from '../types/blog.type';
-import {createReducer, createAction, createSlice, PayloadAction, nanoid} from '@reduxjs/toolkit';
+import {createReducer, createAction, createSlice, PayloadAction, nanoid, AsyncThunk} from '@reduxjs/toolkit';
+
+type GenericAsyncThunk = AsyncThunk<unknown, unknown, any>
+
+type PendingAction = ReturnType<GenericAsyncThunk['pending']>
+type RejectedAction = ReturnType<GenericAsyncThunk['rejected']>
+type FulfilledAction = ReturnType<GenericAsyncThunk['fulfilled']>
 
 
 interface blogState {
@@ -9,7 +15,7 @@ interface blogState {
 }
 
 const initialState: blogState = {
-    postList: intialPostList,
+    postList: [],
     editingPost: null
 }
 
@@ -63,7 +69,26 @@ const blogSlice = createSlice({
             }
         }
 
-    }
+    },
+    extraReducers(builder) {
+        builder
+          .addCase('blog/getPostListSuccess', (state, action: any) => {
+            state.postList = action.payload
+          })
+          .addMatcher<PendingAction>(
+            (action) => action.type.endsWith('/pending'),
+            (state, action) => {
+            }
+          )
+          .addMatcher<RejectedAction | FulfilledAction>(
+            (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
+            (state, action) => {
+            }
+          )
+          .addDefaultCase((state, action) => {
+            // console.log(`action type: ${action.type}`, current(state))
+          })
+      }
 })
 
 // const blogReducer = createReducer(initialState, builder => {
