@@ -92,8 +92,19 @@ export const blogApi = createApi({
               }
             })
           }),
+        updatePost: build.mutation<Post,  { id: string; body: Post }>({
+            query(data){
+                return {
+                    url: `posts/${data.id}`,
+                    method: 'PUT',
+                    body: data.body
+                }
+            },
+            invalidatesTags: (result, error, data) => (error ? [] : [{ type: 'Posts', id: data.id }])
+        }),
+
     }),
 
 });
 
-export const {useGetPostsQuery, useAddPostMutation, useGetPostQuery} = blogApi
+export const {useGetPostsQuery, useAddPostMutation, useGetPostQuery, useUpdatePostMutation} = blogApi

@@ -1,5 +1,5 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query'
-import { useAddPostMutation, useGetPostQuery } from 'pages/blog/blog.service';
+import { useAddPostMutation, useGetPostQuery, useUpdatePostMutation } from 'pages/blog/blog.service';
 import classNames from 'classnames'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -40,7 +40,9 @@ export default function CreatePost() {
     skip: !postId,
     refetchOnMountOrArgChange: 5,
     pollingInterval: 1000
-  })
+  });
+  const [updatePost, updatePostResult] = useUpdatePostMutation();
+
   const errorForm: FormError = useMemo(() => {
     const errorResult = addPostResult.error
     // Vì errorResult có thể là FetchBaseQueryError | SerializedError | undefined, mỗi kiểu lại có cấu trúc khác nhau
@@ -63,7 +65,10 @@ export default function CreatePost() {
     event.preventDefault()
     try {
       if (postId) {
-        
+        await updatePost({
+          body: formData as Post,
+          id: postId
+        }).unwrap();
       } else {
         await addPost(formData).unwrap()
       }
