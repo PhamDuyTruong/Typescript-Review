@@ -1,5 +1,4 @@
-import { useDeletePostMutation, useGetPostsQuery } from 'pages/blog/blog.service'
-import { startEditPost } from 'pages/blog/blog.slice'
+import { useGetPostsQuery } from 'pages/blog/blog.service'
 import { Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import PostItem from '../PostItem'
@@ -9,16 +8,12 @@ export default function PostList() {
   // isLoading chỉ dành cho lần fetch đầu tiên
   // isFetching là cho mỗi lần gọi API
   const { data, isLoading, isFetching } = useGetPostsQuery()
-  const [deletePost] = useDeletePostMutation()
   const dispatch = useDispatch()
   // console.log(data, isLoading, isFetching)
-  const startEdit = (id: string) => {
-    dispatch(startEditPost(id))
-  }
 
-  const handleDeletePost = (id: string) => {
-    deletePost(id)
-  }
+  // const handleDeletePost = (id: string) => {
+  //   deletePost(id)
+  // }
 
   return (
     <div className='bg-white py-6 sm:py-8 lg:py-12'>
@@ -38,7 +33,7 @@ export default function PostList() {
           )}
           {!isFetching &&
             data?.map((post) => (
-              <PostItem key={post.id} post={post} startEdit={startEdit} handleDeletePost={handleDeletePost} />
+              <PostItem key={post.id} post={post} />
             ))}
         </div>
       </div>

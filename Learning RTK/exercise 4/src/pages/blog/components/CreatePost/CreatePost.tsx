@@ -1,6 +1,4 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query'
-import classNames from 'classnames'
-import { useAddPostMutation, useGetPostQuery, useUpdatePostMutation } from 'pages/blog/blog.service'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from 'store'
@@ -27,15 +25,7 @@ type FormError =
 
 export default function CreatePost() {
   const [formData, setFormData] = useState<Omit<Post, 'id'> | Post>(initialState)
-  const [addPost, addPostResult] = useAddPostMutation()
   const postId = useSelector((state: RootState) => state.blog.postId)
-  const { data, refetch } = useGetPostQuery(postId, {
-    skip: !postId,
-    refetchOnMountOrArgChange: 5,
-    pollingInterval: 1000
-  })
-  const [updatePost, updatePostResult] = useUpdatePostMutation()
-
   /**
    * Lỗi có thể đến từ `addPostResult` hoặc `updatePostResult`
    * Vậy chúng ta sẽ dựa vào điều kiện có postId hoặc không có (tức đang trong chế độ edit hay không) để show lỗi
@@ -44,47 +34,47 @@ export default function CreatePost() {
    * Vì errorForm phụ thuộc vào `addPostResult`, `updatePostResult` và `postId` nên có thể dùng một biến để tính toán
    */
 
-  const errorForm: FormError = useMemo(() => {
-    const errorResult = postId ? updatePostResult.error : addPostResult.error
-    // Vì errorResult có thể là FetchBaseQueryError | SerializedError | undefined, mỗi kiểu lại có cấu trúc khác nhau
-    // nên chúng ta cần kiểm tra để hiển thị cho đúng
-    if (isEntityError(errorResult)) {
-      // Có thể ép kiểu một cách an toàn chỗ này, vì chúng ta đã kiểm tra chắc chắn rồi
-      // Nếu không muốn ép kiểu thì có thể khai báo cái interface `EntityError` sao cho data.error tương đồng với FormError là được
-      return errorResult.data.error as FormError
-    }
-    return null
-  }, [postId, updatePostResult, addPostResult])
+  // const errorForm: FormError = useMemo(() => {
+   
+  //   // Vì errorResult có thể là FetchBaseQueryError | SerializedError | undefined, mỗi kiểu lại có cấu trúc khác nhau
+  //   // nên chúng ta cần kiểm tra để hiển thị cho đúng
+  //   if (isEntityError(errorResult)) {
+  //     // Có thể ép kiểu một cách an toàn chỗ này, vì chúng ta đã kiểm tra chắc chắn rồi
+  //     // Nếu không muốn ép kiểu thì có thể khai báo cái interface `EntityError` sao cho data.error tương đồng với FormError là được
+  //     return errorResult.data.error as FormError
+  //   }
+  //   return null
+  // }, [postId, updatePostResult, addPostResult])
 
-  useEffect(() => {
-    if (data) {
-      setFormData(data)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     setFormData(data)
+  //   }
+  // }, [data])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    try {
-      if (postId) {
-        await updatePost({
-          body: formData as Post,
-          id: postId
-        }).unwrap()
-      } else {
-        await addPost(formData).unwrap()
-      }
-      setFormData(initialState)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault()
+  //   try {
+  //     if (postId) {
+  //       await updatePost({
+  //         body: formData as Post,
+  //         id: postId
+  //       }).unwrap()
+  //     } else {
+  //       await addPost(formData).unwrap()
+  //     }
+  //     setFormData(initialState)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       <button
         className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
         type='button'
-        onClick={() => refetch()}
+        // onClick={() => refetch()}
       >
         <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
           Force Fetch
@@ -137,33 +127,33 @@ export default function CreatePost() {
       <div className='mb-6'>
         <label
           htmlFor='publishDate'
-          className={classNames('mb-2 block text-sm font-medium  dark:text-gray-300', {
-            'text-red-700': Boolean(errorForm?.publishDate),
-            'text-gray-900': !Boolean(errorForm?.publishDate)
-          })}
+          // className={classNames('mb-2 block text-sm font-medium  dark:text-gray-300', {
+          //   'text-red-700': Boolean(errorForm?.publishDate),
+          //   'text-gray-900': !Boolean(errorForm?.publishDate)
+          // })}
         >
           Publish Date
         </label>
         <input
           type='datetime-local'
           id='publishDate'
-          className={classNames('block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none ', {
-            'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-blue-500':
-              Boolean(errorForm?.publishDate),
-            'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500': Boolean(
-              errorForm?.publishDate
-            )
-          })}
+          // className={classNames('block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none ', {
+          //   'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-blue-500':
+          //     Boolean(errorForm?.publishDate),
+          //   'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500': Boolean(
+          //     errorForm?.publishDate
+          //   )
+          // })}
           required
           value={formData.publishDate}
           onChange={(event) => setFormData((prev) => ({ ...prev, publishDate: event.target.value }))}
         />
-        {errorForm?.publishDate && (
+        {/* {errorForm?.publishDate && (
           <p className='mt-2 text-sm text-red-600'>
             <span className='font-medium'>Lỗi! </span>
             {errorForm.publishDate}
           </p>
-        )}
+        )} */}
       </div>
       <div className='mb-6 flex items-center'>
         <input

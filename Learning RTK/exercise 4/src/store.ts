@@ -10,7 +10,9 @@ export const store = configureStore({
     [blogApi.reducerPath]: blogApi.reducer// thêm reducer được tạo từ api slice
   },
   // Thêm api middleware để enable các tính năng như caching, invalidation, polling của rtk-query
- 
+  middleware(getDefaultMiddleware){
+    return getDefaultMiddleware().concat(blogApi.middleware)
+  }
 })
 
 // Optional, nhưng bắt buộc nếu dùng tính năng refetchOnFocus/refetchOnReconnect
