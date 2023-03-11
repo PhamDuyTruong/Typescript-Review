@@ -1,4 +1,5 @@
 import { useGetPostsQuery } from 'pages/blog/blog.service'
+import { startEditPost } from '../../blog.slice'
 import { Fragment } from 'react'
 import { useDispatch } from 'react-redux'
 import PostItem from '../PostItem'
@@ -10,7 +11,9 @@ export default function PostList() {
   const { data, isLoading, isFetching } = useGetPostsQuery()
   const dispatch = useDispatch()
   // console.log(data, isLoading, isFetching)
-
+  const startEdit = (id: string) => {
+    dispatch(startEditPost(id));
+  }
   // const handleDeletePost = (id: string) => {
   //   deletePost(id)
   // }
@@ -33,7 +36,7 @@ export default function PostList() {
           )}
           {!isFetching &&
             data?.map((post) => (
-              <PostItem key={post.id} post={post} />
+              <PostItem key={post.id} post={post} startEdit={startEdit}/>
             ))}
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query'
-import { useAddPostMutation } from 'pages/blog/blog.service';
+import { useAddPostMutation, useGetPostQuery } from 'pages/blog/blog.service';
 import classNames from 'classnames'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -36,7 +36,11 @@ export default function CreatePost() {
    * Chúng ta cũng không cần thiết phải tạo một state errorForm
    * Vì errorForm phụ thuộc vào `addPostResult`, `updatePostResult` và `postId` nên có thể dùng một biến để tính toán
    */
-
+  const { data, refetch } = useGetPostQuery(postId, {
+    skip: !postId,
+    refetchOnMountOrArgChange: 5,
+    pollingInterval: 1000
+  })
   const errorForm: FormError = useMemo(() => {
     const errorResult = addPostResult.error
     // Vì errorResult có thể là FetchBaseQueryError | SerializedError | undefined, mỗi kiểu lại có cấu trúc khác nhau
@@ -49,11 +53,11 @@ export default function CreatePost() {
     return null
   }, [postId, addPostResult])
 
-  // useEffect(() => {
-  //   if (data) {
-  //     setFormData(data)
-  //   }
-  // }, [data])
+  useEffect(() => {
+    if (data) {
+      setFormData(data)
+    }
+  }, [data])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -74,7 +78,7 @@ export default function CreatePost() {
       <button
         className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
         type='button'
-        // onClick={() => refetch()}
+        onClick={() => refetch()}
       >
         <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
           Force Fetch
