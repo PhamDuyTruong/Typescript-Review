@@ -12,7 +12,7 @@ const Index = () => {
         ))}
     </div>
     <div className='flex justify-center'>
-        <button className='btn'>Load more</button>
+        <button className='btn hover:scale-125 transition ease-out duration-50'>Load more</button>
     </div>
     </>
   )
