@@ -16,7 +16,7 @@ var corsOptions = {
     res.json({ message: "Welcome to Scheduler back-end service." });
   });
 
-  
+require("./routes/scheduler")(app)
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
